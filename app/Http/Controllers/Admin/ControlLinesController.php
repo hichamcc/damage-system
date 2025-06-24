@@ -56,7 +56,7 @@ class ControlLinesController extends Controller
     public function create()
     {
         $trucks = Truck::where('status', 'active')->get();
-        $users = User::all();
+        $users = User::where('role', 'user')->get();
         
         return view('admin.control.create', compact('trucks', 'users'));
     }
@@ -147,7 +147,7 @@ public function store(Request $request)
     {
         $controlLine->load('tasks');
         $trucks = Truck::all();
-        $users = User::all();
+        $users = User::where('role', 'user')->get();
         
         return view('admin.control.edit', compact('controlLine', 'trucks', 'users'));
     }
