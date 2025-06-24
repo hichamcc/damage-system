@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\TruckController;
 use App\Http\Controllers\Admin\ControlLinesController;
 use App\Http\Controllers\User ;
 use App\Http\Controllers\Admin\TruckTemplateController;
+use App\Http\Controllers\DashboardController;
 
 
 
@@ -14,11 +15,11 @@ Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
-Route::view('dashboard', 'dashboard')
-    ->middleware(['auth', 'verified'])
-    ->name('dashboard');
+
 
 Route::middleware(['auth'])->group(function () {
+    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');  
+
     Route::redirect('settings', 'settings/profile');
 
     Route::get('settings/profile', [Settings\ProfileController::class, 'edit'])->name('settings.profile.edit');

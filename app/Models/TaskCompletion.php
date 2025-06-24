@@ -82,4 +82,8 @@ class TaskCompletion extends Model
      {
          return in_array($this->status, ['issue', 'damaged', 'missing']);
      }
+     public function task()
+     {
+         return $this->belongsTo(ControlTask::class, 'control_task_id');
+     }
 }

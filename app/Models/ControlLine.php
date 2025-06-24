@@ -78,4 +78,8 @@ class ControlLine extends Model
         $completed = $this->completions()->where('check_type', 'exit')->count();
         return $total > 0 ? round(($completed / $total) * 100) : 0;
     }
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'assigned_user_id');
+    }
 }
