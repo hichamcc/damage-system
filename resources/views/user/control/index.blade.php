@@ -81,7 +81,7 @@
         </div>
         <div class="p-6">
             <div class="flex flex-col sm:flex-row gap-4">
-                @if($activeTemplate)
+                @if($activeTemplates->count() > 0)
                     <button type="button" 
                             onclick="openCreateModal()"
                             class="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md transition duration-150 ease-in-out">
@@ -91,14 +91,20 @@
                         Create New Control
                     </button>
                     
-                    <!-- Template Info Badge -->
+                    <!-- Templates Info -->
                     <div class="flex items-center space-x-3 px-4 py-2 bg-blue-50 rounded-md border border-blue-200">
                         <svg class="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                         </svg>
                         <div>
-                            <div class="text-sm font-medium text-blue-900">{{ $activeTemplate->name }}</div>
-                            <div class="text-xs text-blue-700">{{ $activeTemplate->tasks->count() }} tasks ({{ $activeTemplate->tasks->where('is_required', true)->count() }} required)</div>
+                            <div class="text-sm font-medium text-blue-900">{{ $activeTemplates->count() }} Active Templates</div>
+                            <div class="text-xs text-blue-700">
+                                @php
+                                    $truckTemplates = $activeTemplates->where('type', 'truck')->count();
+                                    $trailerTemplates = $activeTemplates->where('type', 'trailer')->count();
+                                @endphp
+                                {{ $truckTemplates }} truck, {{ $trailerTemplates }} trailer
+                            </div>
                         </div>
                     </div>
                 @else
@@ -107,8 +113,8 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/>
                         </svg>
                         <div>
-                            <div class="text-sm font-medium text-yellow-900">No Active Template</div>
-                            <div class="text-xs text-yellow-700">Contact administrator to activate a control template</div>
+                            <div class="text-sm font-medium text-yellow-900">No Active Templates</div>
+                            <div class="text-xs text-yellow-700">Contact administrator to activate control templates</div>
                         </div>
                     </div>
                 @endif
@@ -117,7 +123,7 @@
     </div>
 
     <!-- Create Control Modal -->
-    @if($activeTemplate)
+    @if($activeTemplates->count() > 0)
         <div id="createControlModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 hidden">
             <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
                 <!-- Modal Header -->
@@ -132,23 +138,6 @@
 
                 <!-- Modal Content -->
                 <div class="mt-4">
-                    <!-- Active Template Info -->
-                    <div class="bg-blue-50 rounded-lg p-4 mb-6 border border-blue-200">
-                        <div class="flex items-start">
-                            <svg class="h-6 w-6 text-blue-600 mt-0.5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                            </svg>
-                            <div>
-                                <h5 class="font-medium text-blue-900">{{ $activeTemplate->name }}</h5>
-                                <p class="text-sm text-blue-800 mt-1">{{ $activeTemplate->description }}</p>
-                                <div class="flex items-center mt-2 space-x-4">
-                                    <span class="text-sm text-blue-700">{{ $activeTemplate->tasks->count() }} tasks</span>
-                                    <span class="text-sm text-blue-700">{{ $activeTemplate->tasks->where('is_required', true)->count() }} required</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
                     <!-- Create Control Form -->
                     <form action="{{ route('user.control.store') }}" method="POST" id="createControlForm">
                         @csrf
@@ -157,23 +146,61 @@
                             <!-- Select Truck -->
                             <div>
                                 <label for="modal_truck_id" class="block text-sm font-medium text-gray-700 mb-2">
-                                    Select Truck <span class="text-red-500">*</span>
+                                    Select Vehicle <span class="text-red-500">*</span>
                                 </label>
                                 <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
                                         id="modal_truck_id" 
                                         name="truck_id" 
+                                        onchange="autoSelectTemplate()"
                                         required>
-                                    <option value="">Choose a truck...</option>
+                                    <option value="">Choose a vehicle...</option>
                                     @foreach($trucks as $truck)
-                                        <option value="{{ $truck->id }}">
-                                            {{ $truck->license_plate }} - {{ $truck->make }} {{ $truck->model }}
+                                        <option value="{{ $truck->id }}" data-type="{{ $truck->type }}">
+                                            {{ $truck->type === 'truck' ? '🚛' : '🚚' }} {{ $truck->license_plate }} - {{ $truck->make }} {{ $truck->model }} ({{ ucfirst($truck->type) }})
                                         </option>
                                     @endforeach
                                 </select>
                             </div>
 
-                            <!-- Check Type -->
-                        
+                            <!-- Template Auto-Selected Display -->
+                            <div id="template_display" class="hidden">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    Control Template
+                                </label>
+                                <div class="bg-blue-50 rounded-lg p-4 border border-blue-200">
+                                    <div class="flex items-start">
+                                        <svg class="h-6 w-6 text-blue-600 mt-0.5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                        </svg>
+                                        <div>
+                                            <h5 class="font-medium text-blue-900" id="template_name"></h5>
+                                            <p class="text-sm text-blue-800 mt-1" id="template_description"></p>
+                                          
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Hidden input for template ID -->
+                                <input type="hidden" name="control_template_id" id="hidden_template_id">
+                            </div>
+
+                            <!-- No Template Available Message -->
+                            <div id="no_template_message" class="hidden">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    Control Template
+                                </label>
+                                <div class="bg-yellow-50 rounded-lg p-4 border border-yellow-200">
+                                    <div class="flex items-start">
+                                        <svg class="h-5 w-5 text-yellow-600 mt-0.5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+                                        </svg>
+                                        <div>
+                                            <div class="text-sm font-medium text-yellow-900">No Template Available</div>
+                                            <div class="text-sm text-yellow-800">No active control template found for this vehicle type. Contact administrator.</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                             <!-- Notes -->
                             <div>
                                 <label for="modal_notes" class="block text-sm font-medium text-gray-700 mb-2">Notes (Optional)</label>
@@ -217,7 +244,7 @@
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Truck</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vehicle</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Template</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
@@ -229,15 +256,24 @@
                             <tr class="hover:bg-gray-50">
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="flex items-center">
+                                        <div class="flex-shrink-0 mr-3">
+                                            <span class="text-lg">{{ $control->truck->type === 'truck' ? '🚛' : '🚚' }}</span>
+                                        </div>
                                         <div>
                                             <div class="text-sm font-medium text-gray-900">{{ $control->truck->license_plate }}</div>
                                             <div class="text-sm text-gray-500">{{ $control->truck->make }} {{ $control->truck->model }}</div>
+                                            <div class="text-xs text-gray-400">{{ ucfirst($control->truck->type) }}</div>
                                         </div>
                                     </div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-gray-900">{{ $control->controlTemplate->name }}</div>
-                                    <div class="text-sm text-gray-500">{{ $control->tasks->count() }} tasks</div>
+                                    <div class="flex items-center">
+                                        <span class="text-sm mr-2">{{ $control->controlTemplate->type === 'truck' ? '🚛' : '🚚' }}</span>
+                                        <div>
+                                            <div class="text-sm text-gray-900">{{ $control->controlTemplate->name }}</div>
+                                            <div class="text-sm text-gray-500">{{ $control->tasks->count() }} tasks</div>
+                                        </div>
+                                    </div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     @if($control->status === 'active')
@@ -323,9 +359,11 @@
         </div>
     @endif
 </div>
-@endsection
 
 <script>
+    // Store templates data for auto-selection
+    const templatesData = @json($activeTemplates);
+
     // Modal functions
     function openCreateModal() {
         document.getElementById('createControlModal').classList.remove('hidden');
@@ -337,6 +375,46 @@
         document.body.classList.remove('overflow-hidden');
         // Reset form
         document.getElementById('createControlForm').reset();
+        resetFormFields();
+    }
+
+    function resetFormFields() {
+        document.getElementById('template_display').classList.add('hidden');
+        document.getElementById('no_template_message').classList.add('hidden');
+        document.getElementById('hidden_template_id').value = '';
+    }
+
+    function autoSelectTemplate() {
+        const truckSelect = document.getElementById('modal_truck_id');
+        const selectedOption = truckSelect.options[truckSelect.selectedIndex];
+        const templateDisplay = document.getElementById('template_display');
+        const noTemplateMessage = document.getElementById('no_template_message');
+
+        if (!truckSelect.value) {
+            resetFormFields();
+            return;
+        }
+
+        const truckType = selectedOption.dataset.type;
+        
+        // Find the active template for this truck type
+        const matchingTemplate = templatesData.find(template => template.type === truckType);
+        
+        if (matchingTemplate) {
+            // Auto-select the template and show its info
+            document.getElementById('template_name').textContent = matchingTemplate.name;
+            document.getElementById('template_description').textContent = matchingTemplate.description || 'No description available';
+            document.getElementById('hidden_template_id').value = matchingTemplate.id;
+            
+            // Show template info and hide no template message
+            templateDisplay.classList.remove('hidden');
+            noTemplateMessage.classList.add('hidden');
+        } else {
+            // No template available for this truck type
+            templateDisplay.classList.add('hidden');
+            noTemplateMessage.classList.remove('hidden');
+            document.getElementById('hidden_template_id').value = '';
+        }
     }
 
     // Close modal when clicking outside
@@ -360,15 +438,20 @@
         // Form submission handling
         document.getElementById('createControlForm').addEventListener('submit', function(e) {
             const truckId = document.getElementById('modal_truck_id').value;
-            //const checkType = document.querySelector('input[name="check_type"]:checked');
+            const templateId = document.getElementById('hidden_template_id').value;
             
             if (!truckId) {
                 e.preventDefault();
-                alert('Please select a truck.');
+                alert('Please select a vehicle.');
                 return false;
             }
-            
 
+            if (!templateId) {
+                e.preventDefault();
+                alert('No control template available for this vehicle type. Please contact administrator.');
+                return false;
+            }
         });
     });
 </script>
+@endsection

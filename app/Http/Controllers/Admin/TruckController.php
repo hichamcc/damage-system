@@ -68,6 +68,7 @@ class TruckController extends Controller
         $validated = $request->validate([
             'truck_number' => ['required', 'string', 'max:255', 'unique:trucks'],
             'license_plate' => ['required', 'string', 'max:255', 'unique:trucks'],
+            'type' => 'required|in:truck,trailer',
             'make' => ['required', 'string', 'max:255'],
             'model' => ['required', 'string', 'max:255'],
             'status' => ['required', 'in:active,maintenance,out_of_service,retired'],
@@ -126,6 +127,7 @@ class TruckController extends Controller
         $validated = $request->validate([
             'truck_number' => ['required', 'string', 'max:255', Rule::unique('trucks')->ignore($truck->id)],
             'license_plate' => ['required', 'string', 'max:255', Rule::unique('trucks')->ignore($truck->id)],
+            'type' => 'required|in:truck,trailer',
             'make' => ['required', 'string', 'max:255'],
             'model' => ['required', 'string', 'max:255'],
             'status' => ['required', 'in:active,maintenance,out_of_service,retired'],

@@ -12,6 +12,7 @@ class ControlTemplate extends Model
     protected $fillable = [
         'name',
         'description',
+        'type',
         'is_active',
         'created_by',
     ];
@@ -40,8 +41,26 @@ class ControlTemplate extends Model
         return $query->where('is_active', true);
     }
 
-    public static function getActiveTemplate()
+    public static function getActiveTemplate($type)
     {
-        return self::where('is_active', true)->with('tasks')->first();
+        return self::where('is_active', true)->where('type', $type)->with('tasks')->first();
+    }
+
+    // Add scope for filtering by type
+    public function scopeForType($query, $type)
+    {
+        return $query->where('type', $type);
+    }
+
+    // Add accessor for formatted type
+    public function getFormattedTypeAttribute()
+    {
+        return ucfirst($this->type);
+    }
+
+    // Add method to get icon
+    public function getTypeIconAttribute()
+    {
+        return $this->type === 'truck' ? '🚛' : '🚚';
     }
 }

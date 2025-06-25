@@ -52,6 +52,7 @@ class ControlTemplatesController extends Controller
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'type' => 'required|in:truck,trailer', 
             'description' => 'nullable|string',
             'is_active' => 'boolean',
             'tasks' => 'required|array|min:1',
@@ -63,15 +64,18 @@ class ControlTemplatesController extends Controller
             'tasks.*.template_reference_number' => 'nullable|integer|min:1',
         ]);
 
-        // If setting this as active, deactivate all others (only one active template)
+        // If setting this as active, deactivate all others (only one active template) per type
         if ($validated['is_active'] ?? false) {
-            ControlTemplate::where('is_active', true)->update(['is_active' => false]);
+            ControlTemplate::where('is_active', true)
+                ->where('type', $validated['type'])
+                ->update(['is_active' => false]);
         }
 
         // Create control template
         $template = ControlTemplate::create([
             'name' => $validated['name'],
             'description' => $validated['description'],
+            'type' => $validated['type'],
             'is_active' => $validated['is_active'] ?? false,
             'created_by' => auth()->id(),
         ]);
@@ -131,9 +135,11 @@ class ControlTemplatesController extends Controller
             })->values()->toArray()
         ]);
 
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
+            'type' => 'required|in:truck,trailer',  
             'is_active' => 'boolean',
             'tasks' => 'required|array|min:1',
             'tasks.*.id' => 'nullable|exists:control_template_tasks,id',
@@ -145,9 +151,10 @@ class ControlTemplatesController extends Controller
             'tasks.*.template_reference_number' => 'nullable|integer|min:1',
         ]);
 
-        // If setting this as active, deactivate all others (only one active template)
+        // If setting this as active, deactivate all others (only one active template) per type
         if ($validated['is_active'] ?? false) {
             ControlTemplate::where('is_active', true)
+                ->where('type', $validated['type'])
                 ->where('id', '!=', $controlTemplate->id)
                 ->update(['is_active' => false]);
         }
@@ -155,6 +162,7 @@ class ControlTemplatesController extends Controller
         // Update control template
         $controlTemplate->update([
             'name' => $validated['name'],
+            'type' => $validated['type'],
             'description' => $validated['description'],
             'is_active' => $validated['is_active'] ?? false,
         ]);
@@ -202,8 +210,10 @@ class ControlTemplatesController extends Controller
     public function toggleActive(ControlTemplate $controlTemplate)
     {
         if (!$controlTemplate->is_active) {
-            // Deactivate all other templates (only one active)
-            ControlTemplate::where('is_active', true)->update(['is_active' => false]);
+            // Deactivate all other templates (only one active) per type
+            ControlTemplate::where('is_active', true)
+                ->where('type', $controlTemplate->type)
+                ->update(['is_active' => false]);
             $controlTemplate->update(['is_active' => true]);
             $message = 'Template activated successfully.';
         } else {

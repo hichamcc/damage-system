@@ -13,6 +13,7 @@ class Truck extends Model
     protected $fillable = [
         'truck_number',
         'license_plate',
+        'type',
         'make',
         'model',
         'status',
@@ -79,4 +80,16 @@ class Truck extends Model
     {
         return $this->hasMany(ControlLine::class);
     }
+
+    // Optional: Add a scope for filtering by type
+        public function scopeOfType($query, $type)
+        {
+            return $query->where('type', $type);
+        }
+
+        // Optional: Add accessor for formatted type
+        public function getFormattedTypeAttribute()
+        {
+            return ucfirst($this->type);
+        }
 }

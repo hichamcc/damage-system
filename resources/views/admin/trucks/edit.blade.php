@@ -60,6 +60,32 @@
                                 @enderror
                             </div>
 
+                            <div>
+                                <label for="type" class="block text-sm font-medium text-gray-700 mb-2">
+                                    Type <span class="text-red-500">*</span>
+                                </label>
+                                <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('type') border-red-500 @enderror" 
+                                        id="type" 
+                                        name="type" 
+                                        required>
+                                    <option value="">Select Type</option>
+                                    <option value="truck" {{ old('type', $truck->type ?? 'truck') === 'truck' ? 'selected' : '' }}>
+                                        🚛 Truck
+                                    </option>
+                                    <option value="trailer" {{ old('type', $truck->type ?? '') === 'trailer' ? 'selected' : '' }}>
+                                        🚚 Trailer
+                                    </option>
+                                </select>
+                                
+                                @error('type')
+                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                                
+                                <p class="mt-1 text-xs text-gray-500">
+                                    Select whether this is a truck or trailer unit.
+                                </p>
+                            </div>
+
                             <!-- License Plate -->
                             <div class="mb-4">
                                 <label for="license_plate" class="block text-sm font-medium text-gray-700 mb-2">

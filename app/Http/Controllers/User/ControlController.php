@@ -15,9 +15,9 @@ class ControlController extends Controller
      */
     public function index()
     {
-        $activeTemplate = ControlTemplate::getActiveTemplate();
+        $activeTemplates = ControlTemplate::where('is_active', true)->get();
         
-        if (!$activeTemplate) {
+        if (!$activeTemplates) {
             return view('user.control.no-template');
         }
 
@@ -38,7 +38,7 @@ class ControlController extends Controller
                 ->whereDate('updated_at', today())->count(),
         ];
 
-        return view('user.control.index', compact('activeTemplate', 'userControls', 'trucks', 'stats'));
+        return view('user.control.index', compact('activeTemplates', 'userControls', 'trucks', 'stats'));
     }
 
     /**
@@ -52,7 +52,9 @@ class ControlController extends Controller
             'notes' => 'nullable|string',
         ]);
 
-        $activeTemplate = ControlTemplate::getActiveTemplate();
+        $type = Truck::find($validated['truck_id'])->type;
+
+        $activeTemplate = ControlTemplate::getActiveTemplate($type);
         
         if (!$activeTemplate) {
             return redirect()->back()->with('error', 'No active control template available.');

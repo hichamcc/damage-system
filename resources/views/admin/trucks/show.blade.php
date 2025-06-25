@@ -80,6 +80,14 @@
                                 <p class="mt-1 text-sm text-gray-900">#{{ $truck->truck_number }}</p>
                             </div>
                             <div>
+                                <label class="block text-sm font-medium text-gray-500">Type</label>
+                                <p class="mt-1 text-sm text-gray-900">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $truck->type === 'truck' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800' }}">
+                                        {{ ucfirst($truck->type) }}
+                                    </span>
+                                </p>
+                            </div>
+                            <div>
                                 <label class="block text-sm font-medium text-gray-500">License Plate</label>
                                 <p class="mt-1 text-sm text-gray-900">{{ $truck->license_plate }}</p>
                             </div>
