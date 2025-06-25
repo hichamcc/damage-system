@@ -4,18 +4,16 @@ use App\Http\Controllers\Settings;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\TruckController;
 use App\Http\Controllers\Admin\ControlLinesController;
-use App\Http\Controllers\User ;
+use App\Http\Controllers\Admin\ControlTemplatesController;
+use App\Http\Controllers\User\ControlController;
 use App\Http\Controllers\Admin\TruckTemplateController;
 use App\Http\Controllers\DashboardController;
-
-
+use App\Http\Controllers\User;
 
 
 Route::get('/', function () {
     return view('welcome');
 })->name('home');
-
-
 
 Route::middleware(['auth'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');  
@@ -33,112 +31,82 @@ Route::middleware(['auth'])->group(function () {
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::resource('users', \App\Http\Controllers\Admin\UserController::class);
 
-      // GET routes
+    // Trucks Management
     Route::get('trucks', [TruckController::class, 'index'])->name('trucks.index');
     Route::get('trucks/create', [TruckController::class, 'create'])->name('trucks.create');
     Route::get('trucks/{truck}', [TruckController::class, 'show'])->name('trucks.show');
     Route::get('trucks/{truck}/edit', [TruckController::class, 'edit'])->name('trucks.edit');
-    
-    // POST routes
     Route::post('trucks', [TruckController::class, 'store'])->name('trucks.store');
-    
-    // PUT/PATCH routes
     Route::put('trucks/{truck}', [TruckController::class, 'update'])->name('trucks.update');
     Route::patch('trucks/{truck}', [TruckController::class, 'update'])->name('trucks.patch');
-    
-    // DELETE routes
     Route::delete('trucks/d/{truck}', [TruckController::class, 'destroy'])->name('trucks.destroy');
-    
-       // Additional truck routes for file management
-       Route::delete('trucks/{truck}/attachments/{index}', [TruckController::class, 'removeAttachment'])
-           ->name('trucks.attachments.remove');
-       
-       Route::get('trucks/{truck}/attachments/{index}/download', [TruckController::class, 'downloadAttachment'])
-           ->name('trucks.attachments.download');
-
-        // Control Lines Management
-        Route::get('control', [ControlLinesController::class, 'index'])->name('control.index');
-        Route::get('control/create', [ControlLinesController::class, 'create'])->name('control.create');
-        Route::post('control', [ControlLinesController::class, 'store'])->name('control.store');
-        Route::get('control/{controlLine}', [ControlLinesController::class, 'show'])->name('control.show');
-        Route::get('control/{controlLine}/compare', [ControlLinesController::class, 'compareChecks'])->name('control.compare');
-        Route::get('control/{controlLine}/edit', [ControlLinesController::class, 'edit'])->name('control.edit');
-        Route::put('control/{controlLine}', [ControlLinesController::class, 'update'])->name('control.update');
-        Route::delete('control/{controlLine}', [ControlLinesController::class, 'destroy'])->name('control.destroy');
-        Route::post('control/{controlLine}/tasks', [ControlLinesController::class, 'addTask'])->name('control.tasks.add');
-        Route::delete('control/{controlLine}/tasks/{task}', [ControlLinesController::class, 'removeTask'])->name('control.tasks.remove');
-        Route::get('control/{controlLine}/damage-reports', [ControlLinesController::class, 'damageReports'])->name('control.damage-reports');
-        Route::put('control/{controlLine}/damage/{damageReport}', [ControlLinesController::class, 'markDamageFixed'])->name('control.damage.mark-fixed');
 
 
-         // Control damage reports
-            Route::get('/control/{controlLine}/damages', [ControlLinesController::class, 'damageReports'])
-            ->name('control.damages');
+    //truck templates
+    Route::resource('truck-templates', TruckTemplateController::class);
+    Route::patch('truck-templates/{truckTemplate}/toggle-status', [TruckTemplateController::class, 'toggleStatus'])
+        ->name('truck-templates.toggle-status');
 
-        // Mark damage as fixed
-        Route::patch('/damage/{damage}/mark-fixed', [ControlLinesController::class, 'markDamageFixed'])
-            ->name('damage.mark-fixed');
-
-        // Update damage status (for marking as in repair)
-        Route::patch('/damage/{damage}/status', [ControlLinesController::class, 'updateDamageStatus'])
-            ->name('damage.update-status');
-
-        // All damage reports (optional - for viewing all damages across all controls)
-        Route::get('/damages', [ControlLinesController::class, 'allDamages'])
-            ->name('damages.index');
-
-        // Individual damage report view (optional)
-        Route::get('/damage/{damage}', [ControlLinesController::class, 'showDamage'])
-            ->name('damage.show');
-
-        // Delete damage report (optional)
-        Route::delete('/damage/{damage}', [ControlLinesController::class, 'deleteDamage'])
-            ->name('damage.delete');
-
-
-
-             // Truck Templates Resource Routes
+    //truck templates
     Route::resource('truck-templates', TruckTemplateController::class);
     
-    // Additional template routes
-    Route::patch('/truck-templates/{truckTemplate}/toggle-status', [TruckTemplateController::class, 'toggleStatus'])
-        ->name('truck-templates.toggle-status');
-    
-    // API endpoint for getting templates (for AJAX in control creation)
-    Route::get('/api/truck-templates', [TruckTemplateController::class, 'getTemplates'])
-        ->name('truck-templates.api');
-        });
+    // Additional truck routes for file management
+    Route::delete('trucks/{truck}/attachments/{index}', [TruckController::class, 'removeAttachment'])
+        ->name('trucks.attachments.remove');
+    Route::get('trucks/{truck}/attachments/{index}/download', [TruckController::class, 'downloadAttachment'])
+        ->name('trucks.attachments.download');
 
+    // Control Templates Management (NEW)
+    Route::resource('control-templates', ControlTemplatesController::class);
+    Route::patch('control-templates/{controlTemplate}/toggle-active', [ControlTemplatesController::class, 'toggleActive'])
+        ->name('control-templates.toggle-active');
 
-// User Routes (for completing START/EXIT checks)
-Route::prefix('user')->name('user.')->middleware(['auth'])->group(function () {
+    // Control Lines Management (UPDATED - View Only for User-Created Controls)
+    Route::get('controls', [ControlLinesController::class, 'index'])->name('control.index');
+    Route::get('controls/{controlLine}', [ControlLinesController::class, 'show'])->name('control.show');
+    Route::get('controls/{controlLine}/compare', [ControlLinesController::class, 'compareChecks'])->name('control.compare');
+    Route::get('controls/{controlLine}/damages', [ControlLinesController::class, 'damageReports'])->name('control.damages');
     
-    // User Dashboard
-    Route::get('dashboard', [User\CheckController::class, 'dashboard'])->name('dashboard');
+    // Damage Reports Management
+    Route::get('damages', [ControlLinesController::class, 'allDamages'])->name('damages.index');
+    Route::get('damages/{damage}', [ControlLinesController::class, 'showDamage'])->name('damages.show');
+    Route::patch('damages/{damage}/status', [ControlLinesController::class, 'updateDamageStatus'])->name('damages.update-status');
+    Route::patch('damages/{damage}/fixed', [ControlLinesController::class, 'markDamageFixed'])->name('damages.mark-fixed');
+    Route::delete('damages/{damage}', [ControlLinesController::class, 'deleteDamage'])->name('damages.destroy');
+});
+
+// User Routes (NEW - For Creating and Managing Their Own Controls)
+Route::middleware(['auth'])->prefix('user')->name('user.')->group(function () {
     
-    // Available Controls (assigned to user)
-    Route::get('controls', [User\CheckController::class, 'myControls'])->name('controls');
-    Route::get('controls/{controlLine}', [User\CheckController::class, 'show'])->name('controls.show');
+    // User Dashboard - Create New Controls
+    Route::get('dashboard', [ControlController::class, 'index'])->name('control.index');
     
-    // Start Check
-    Route::get('controls/{controlLine}/start', [User\CheckController::class, 'startCheck'])->name('controls.start');
-    Route::post('controls/{controlLine}/start', [User\CheckController::class, 'submitStartCheck'])->name('controls.start.submit');
+    Route::post('control/create', [ControlController::class, 'store'])->name('control.store');
+    Route::get('control/{controlLine}', [ControlController::class, 'show'])->name('control.show');
     
-    // Exit Check
-    Route::get('controls/{controlLine}/exit', [User\CheckController::class, 'exitCheck'])->name('controls.exit');
-    Route::post('controls/{controlLine}/exit', [User\CheckController::class, 'submitExitCheck'])->name('controls.exit.submit');
+    // Check Forms
+    Route::get('control/{controlLine}/start', [ControlController::class, 'start'])->name('control.start');
+    Route::get('control/{controlLine}/exit', [ControlController::class, 'exit'])->name('control.exit');
     
+    // API Routes for AJAX
+    Route::get('api/active-template', [ControlController::class, 'getActiveTemplate'])->name('api.active-template');
+
+    // Keep existing check completion routes (assuming you have CheckController for task completion)
     // Complete Task
     Route::put('tasks/{controlTask}/complete', [User\CheckController::class, 'completeTask'])->name('tasks.complete');
     
     // Report Damage
     Route::post('controls/{controlLine}/damage', [User\CheckController::class, 'reportDamage'])->name('controls.damage');
+    
+    // Submit Check Forms (if you have these methods)
+    Route::post('controls/{controlLine}/start', [User\CheckController::class, 'submitStartCheck'])->name('controls.start.submit');
+    Route::post('controls/{controlLine}/exit', [User\CheckController::class, 'submitExitCheck'])->name('controls.exit.submit');
 });
 
-// In web.php (for web-based AJAX calls)
+// API Routes for AJAX calls
 Route::middleware(['auth'])->group(function () {
     
-    // Get all active templates (with optional filtering)
+    // Get all active truck templates (for admin template creation)
     Route::get('/admin/api/truck-templates', [TruckTemplateController::class, 'getTemplates'])
         ->name('admin.truck-templates.api');
     
@@ -150,6 +118,5 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/admin/api/truck-templates/simple', [TruckTemplateController::class, 'getTemplatesSimple'])
         ->name('admin.truck-templates.api.simple');
 });
-
 
 require __DIR__.'/auth.php';

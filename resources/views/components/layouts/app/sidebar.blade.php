@@ -47,6 +47,9 @@
                     <x-navlist.item before="phosphor-truck" :href="route('admin.trucks.index')" :current="request()->routeIs('admin.trucks.*')">
                         {{ __('Trucks') }}
                     </x-navlist.item>
+                    <x-navlist.item before="phosphor-truck" :href="route('admin.control-templates.index')" :current="request()->routeIs('admin.control-templates.*')">
+                        {{ __('Control Templates') }}
+                    </x-navlist.item>
                     <x-navlist.item before="phosphor-truck" :href="route('admin.truck-templates.index')" :current="request()->routeIs('admin.truck-templates.*')">
                         {{ __('Truck Templates') }}
                     </x-navlist.item>
@@ -55,15 +58,16 @@
 
                 @if(auth()->user()->role === 'user')
                 <x-navlist.group :heading="__('Platform')">
-                    <x-navlist.item before="phosphor-house-line" :href="route('user.dashboard')" :current="request()->routeIs('user.dashboard')">
+
+                    <x-navlist.item before="phosphor-house-line" :href="route('dashboard')" :current="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-navlist.item>
-                </x-navlist.group>
-                <x-navlist.group :heading="__('Control')">
-                    <x-navlist.item before="phosphor-truck" :href="route('user.controls')" :current="request()->routeIs('user.controls.*')">
+               
+                    <x-navlist.item before="phosphor-truck" :href="route('user.control.index')" :current="request()->routeIs('user.control.*')">
                         {{ __('Controls') }}
                     </x-navlist.item>
                 </x-navlist.group>
+               
                 @endif
             </x-navlist>
 

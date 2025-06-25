@@ -1,120 +1,98 @@
 @extends('components.layouts.app')
 
-@section('title', 'Create Control Line')
+@section('title', 'Edit Control Template')
 
 @section('content')
 <div class="p-6">
     <div class="bg-white rounded-lg shadow">
         <!-- Header Section -->
         <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-            <h3 class="text-lg font-medium text-gray-900">Create New Control Line</h3>
+            <h3 class="text-lg font-medium text-gray-900">Edit Control Template</h3>
             <div class="flex space-x-2">
                 <a href="{{ route('admin.truck-templates.index') }}" 
                    class="inline-flex items-center px-4 py-2 border border-blue-300 hover:bg-blue-50 text-blue-700 text-sm font-medium rounded-md transition duration-150 ease-in-out">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                     </svg>
-                    Manage Templates
+                    Manage Truck Templates
                 </a>
-                <a href="{{ route('admin.control.index') }}" 
+                <a href="{{ route('admin.control-templates.show', $controlTemplate) }}" 
                    class="inline-flex items-center px-4 py-2 border border-gray-300 hover:bg-gray-50 text-gray-700 text-sm font-medium rounded-md transition duration-150 ease-in-out">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
                     </svg>
-                    Back to Control
+                    Back to Template
                 </a>
             </div>
         </div>
+        
         <!-- Form Content Container -->
         <div class="p-6">
-            <form action="{{ route('admin.control.store') }}" method="POST" id="control-form">
+            <form action="{{ route('admin.control-templates.update', $controlTemplate) }}" method="POST" id="template-form">
                 @csrf
+                @method('PUT')
                 
-                <!-- Main Grid Layout: Left = Control Info, Right = Tasks -->
-                <div class="grid grid-cols-1 lg:grid-cols-1 gap-8">
-                    <!-- Control Information (Left Column) -->
-                    <div class="space-y-6">
-                        <div>
-                            <h4 class="text-md font-medium text-gray-900 mb-4">Control Information</h4>
-                            
-                            <!-- Select Truck -->
-                            <div class="mb-4">
-                                <label for="truck_id" class="block text-sm font-medium text-gray-700 mb-2">
-                                    Select Truck <span class="text-red-500">*</span>
-                                </label>
-                                <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('truck_id') border-red-500 @enderror" 
-                                        id="truck_id" 
-                                        name="truck_id" 
-                                        required>
-                                    <option value="">Select Truck by License Plate</option>
-                                    @foreach($trucks as $truck)
-                                        <option value="{{ $truck->id }}" data-truck-type="{{ $truck->truck_type ?? '' }}" {{ old('truck_id') == $truck->id ? 'selected' : '' }}>
-                                            {{ $truck->license_plate }} - {{ $truck->make }} {{ $truck->model }} ({{ $truck->truck_number }})
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('truck_id')
-                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                @enderror
-                            </div>
+                <!-- Template Information -->
+                <div class="space-y-6">
+                    <div>
+                        <h4 class="text-md font-medium text-gray-900 mb-4">Template Information</h4>
+                        
+                        <!-- Template Name -->
+                        <div class="mb-4">
+                            <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
+                                Template Name <span class="text-red-500">*</span>
+                            </label>
+                            <input type="text" 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('name') border-red-500 @enderror" 
+                                   id="name" 
+                                   name="name" 
+                                   value="{{ old('name', $controlTemplate->name) }}"
+                                   placeholder="e.g., Standard Vehicle Check Template"
+                                   required>
+                            @error('name')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
 
-                            <!-- Assign User -->
-                            <div class="mb-4">
-                                <label for="assigned_user_id" class="block text-sm font-medium text-gray-700 mb-2">
-                                    Assign User <span class="text-red-500">*</span>
-                                </label>
-                                <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('assigned_user_id') border-red-500 @enderror" 
-                                        id="assigned_user_id" 
-                                        name="assigned_user_id" 
-                                        required>
-                                    <option value="">Select User</option>
-                                    @foreach($users as $user)
-                                        <option value="{{ $user->id }}" {{ old('assigned_user_id') == $user->id ? 'selected' : '' }}>
-                                            {{ $user->name }} ({{ $user->email }})
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('assigned_user_id')
-                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                @enderror
-                            </div>
+                        <!-- Template Description -->
+                        <div class="mb-4">
+                            <label for="description" class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                            <textarea class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('description') border-red-500 @enderror" 
+                                      id="description" 
+                                      name="description" 
+                                      rows="3"
+                                      placeholder="Describe what this template is used for...">{{ old('description', $controlTemplate->description) }}</textarea>
+                            @error('description')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
 
-                            <!-- Assignment Date -->
-                            <div class="mb-4">
-                                <label for="assigned_at" class="block text-sm font-medium text-gray-700 mb-2">
-                                    Assignment Date <span class="text-red-500">*</span>
+                        <!-- Active Status -->
+                        <div class="mb-4">
+                            <div class="flex items-center">
+                                <input type="checkbox" 
+                                       class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" 
+                                       id="is_active" 
+                                       name="is_active" 
+                                       value="1"
+                                       {{ old('is_active', $controlTemplate->is_active) ? 'checked' : '' }}>
+                                <label for="is_active" class="ml-2 block text-sm text-gray-700">
+                                    Set as Active Template
+                                    <span class="text-xs text-gray-500 block">Only one template can be active at a time. This will deactivate other templates.</span>
                                 </label>
-                                <input type="datetime-local" 
-                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('assigned_at') border-red-500 @enderror" 
-                                       id="assigned_at" 
-                                       name="assigned_at" 
-                                       value="{{ old('assigned_at', now()->format('Y-m-d\TH:i')) }}" 
-                                       required>
-                                @error('assigned_at')
-                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                @enderror
                             </div>
-
-                            <!-- Notes -->
-                            <div class="mb-4">
-                                <label for="notes" class="block text-sm font-medium text-gray-700 mb-2">Notes</label>
-                                <textarea class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('notes') border-red-500 @enderror" 
-                                          id="notes" 
-                                          name="notes" 
-                                          rows="3"
-                                          placeholder="Additional notes for this control...">{{ old('notes') }}</textarea>
-                                @error('notes')
-                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                @enderror
-                            </div>
+                            @error('is_active')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
                         </div>
                     </div>
-                    <!-- Tasks Section (Right Column) -->
+
+                    <!-- Tasks Section -->
                     <div class="space-y-6">
                         <div>
                             <!-- Tasks Header with Add Button -->
                             <div class="flex justify-between items-center mb-4">
-                                <h4 class="text-md font-medium text-gray-900">Control Tasks</h4>
+                                <h4 class="text-md font-medium text-gray-900">Template Tasks</h4>
                                 <button type="button" id="add-task" class="inline-flex items-center px-3 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-md">
                                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
@@ -122,8 +100,9 @@
                                     Add Task
                                 </button>
                             </div>
-                            <!-- Template Reference Gallery -->
-                            <div id="templates-reference" class="hidden mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+
+                            <!-- Truck Template Reference Gallery -->
+                            <div id="templates-reference" class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                                 <h5 class="text-sm font-medium text-blue-900 mb-3 flex items-center">
                                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
@@ -137,8 +116,9 @@
 
                             <!-- Tasks Container -->
                             <div id="tasks-container" class="space-y-4">
-                                <!-- Tasks will be added here dynamically -->
+                                <!-- Existing tasks will be loaded here -->
                             </div>
+
                             <!-- Task Template (Hidden - Used by JavaScript) -->
                             <div id="task-template" class="hidden">
                                 <div class="task-item p-4 border border-gray-200 rounded-lg">
@@ -152,6 +132,9 @@
                                     </div>
                                     
                                     <div class="space-y-3">
+                                        <!-- Hidden ID field for existing tasks -->
+                                        <input type="hidden" class="task-id" value="">
+                                        
                                         <!-- Task Title -->
                                         <div>
                                             <label class="block text-sm font-medium text-gray-700 mb-1">Task Title <span class="text-red-500">*</span></label>
@@ -215,6 +198,7 @@
                                     </div>
                                 </div>
                             </div>
+
                             <!-- Quick Add Buttons -->
                             <div class="mt-4 p-4 bg-gray-50 rounded-lg">
                                 <h5 class="text-sm font-medium text-gray-700 mb-3">Quick Add Common Tasks:</h5>
@@ -265,12 +249,12 @@
                             </div>
                         </div>
                     </div>
-                </div> <!-- End of grid layout -->
+                </div> <!-- End of space-y-6 -->
 
                 <!-- Form Actions -->
                 <div class="mt-8 pt-6 border-t border-gray-200">
                     <div class="flex justify-end space-x-3">
-                        <a href="{{ route('admin.control.index') }}" 
+                        <a href="{{ route('admin.control-templates.show', $controlTemplate) }}" 
                            class="inline-flex items-center px-4 py-2 border border-gray-300 hover:bg-gray-50 text-gray-700 text-sm font-medium rounded-md transition duration-150 ease-in-out">
                             Cancel
                         </a>
@@ -279,7 +263,7 @@
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/>
                             </svg>
-                            Create Control Line
+                            Update Template
                         </button>
                     </div>
                 </div>
@@ -287,6 +271,7 @@
         </div>
     </div>
 </div>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         let taskIndex = 0;
@@ -294,12 +279,14 @@
         const tasksContainer = document.getElementById('tasks-container');
         const taskTemplate = document.getElementById('task-template');
         const addTaskButton = document.getElementById('add-task');
-        const truckSelect = document.getElementById('truck_id');
         const templatesReference = document.getElementById('templates-reference');
         const templatesGallery = document.getElementById('templates-gallery');
+        
+        // Existing tasks data from server
+        const existingTasks = @json($controlTemplate->tasks);
     
         // Add task function
-        function addTask(title = '', description = '', type = 'check', required = true) {
+        function addTask(title = '', description = '', type = 'check', required = true, taskId = null, truckTemplateId = null, templateRefNumber = null) {
             const newTask = taskTemplate.cloneNode(true);
             newTask.id = '';
             newTask.classList.remove('hidden');
@@ -308,14 +295,18 @@
             newTask.querySelector('.task-number').textContent = taskIndex + 1;
             
             // Set up proper form field names and add required attribute
+            const taskIdInput = newTask.querySelector('.task-id');
             const titleInput = newTask.querySelector('.task-title');
             const descInput = newTask.querySelector('.task-description');
             const typeSelect = newTask.querySelector('.task-type');
             const requiredInput = newTask.querySelector('.task-required');
-            const templateSelect = newTask.querySelector('.task-template');
             const templateNumberInput = newTask.querySelector('.task-template-number');
             const templateNumberContainer = newTask.querySelector('.template-number-container');
             
+            if (taskId) {
+                taskIdInput.name = `tasks[${taskIndex}][id]`;
+                taskIdInput.value = taskId;
+            }
             titleInput.name = `tasks[${taskIndex}][title]`;
             titleInput.required = true;
             descInput.name = `tasks[${taskIndex}][description]`;
@@ -332,13 +323,13 @@
             if (description) descInput.value = description;
             if (type) typeSelect.value = type;
             requiredInput.checked = required;
+            if (templateRefNumber) templateNumberInput.value = templateRefNumber;
 
             // Populate template options
             populateTemplateOptions(newTask);
 
             // Handle "No Template" selection
             const noTemplateRadio = newTask.querySelector('input[type="radio"][value=""]');
-            //const templateNumberContainer = newTask.querySelector('.template-number-container');
             
             noTemplateRadio.name = `tasks[${taskIndex}][truck_template_id]`;
             noTemplateRadio.addEventListener('change', function() {
@@ -351,6 +342,20 @@
                     templateNumberInput.value = '';
                 }
             });
+
+            // Set truck template if provided
+            if (truckTemplateId) {
+                const templateRadio = newTask.querySelector(`input[value="${truckTemplateId}"]`);
+                if (templateRadio) {
+                    templateRadio.checked = true;
+                    templateRadio.closest('.template-option').classList.add('border-blue-500', 'bg-blue-50');
+                    templateNumberContainer.style.display = 'block';
+                } else {
+                    noTemplateRadio.checked = true;
+                }
+            } else {
+                noTemplateRadio.checked = true;
+            }
     
             // Add remove functionality
             newTask.querySelector('.remove-task').addEventListener('click', function() {
@@ -362,7 +367,7 @@
             taskIndex++;
         }
 
-        // Populate template options for a specific radio container
+        // Same template functions from create view
         function populateTemplateOptions(taskItem) {
             const templateContainer = taskItem.querySelector('.template-options');
             const radioName = `tasks[${taskItem.dataset.taskIndex || 0}][truck_template_id]`;
@@ -424,7 +429,6 @@
             });
         }
 
-        // Update all template options when templates are loaded
         function updateAllTemplateOptions() {
             document.querySelectorAll('.task-item').forEach((taskItem, index) => {
                 taskItem.dataset.taskIndex = index;
@@ -443,19 +447,22 @@
             });
         }
     
-        // Update task numbers after removal
         function updateTaskNumbers() {
             const tasks = tasksContainer.querySelectorAll('.task-item');
             tasks.forEach((task, index) => {
                 task.querySelector('.task-number').textContent = index + 1;
                 
-                // Update form field names and ensure required is set
+                // Update form field names
+                const taskIdInput = task.querySelector('.task-id');
                 const titleInput = task.querySelector('.task-title');
                 const descInput = task.querySelector('.task-description');
                 const typeSelect = task.querySelector('.task-type');
                 const requiredInput = task.querySelector('.task-required');
                 const templateNumberInput = task.querySelector('.task-template-number');
                 
+                if (taskIdInput.value) {
+                    taskIdInput.name = `tasks[${index}][id]`;
+                }
                 titleInput.name = `tasks[${index}][title]`;
                 titleInput.required = true;
                 descInput.name = `tasks[${index}][description]`;
@@ -474,31 +481,22 @@
             taskIndex = tasks.length;
         }
     
-        // Load and display templates
         function loadTemplates() {
-            const selectedTruck = truckSelect.options[truckSelect.selectedIndex];
-            const truckType = selectedTruck?.dataset.truckType || '';
-    
-            if (!truckSelect.value) {
-                templatesReference.classList.add('hidden');
-                availableTemplates = [];
-                updateAllTemplateOptions();
-                return;
-            }
-    
-            fetch(`{{ route('admin.truck-templates.api') }}?truck_type=${truckType}`)
+            fetch(`{{ route('admin.truck-templates.api') }}`)
                 .then(response => response.json())
                 .then(data => {
                     availableTemplates = data;
                     displayTemplates();
                     updateAllTemplateOptions();
+                    
+                    // Load existing tasks after templates are loaded
+                    loadExistingTasks();
                 })
                 .catch(error => {
                     console.error('Error loading templates:', error);
                 });
         }
     
-        // Display templates in reference gallery
         function displayTemplates() {
             templatesGallery.innerHTML = '';
             
@@ -529,13 +527,25 @@
                 
                 templatesGallery.appendChild(templateCard);
             });
-            
-            //templatesReference.classList.remove('hidden');
+        }
+
+        function loadExistingTasks() {
+            // Load existing tasks
+            existingTasks.forEach(task => {
+                addTask(
+                    task.title, 
+                    task.description, 
+                    task.task_type, 
+                    task.is_required,
+                    task.id,
+                    task.truck_template_id,
+                    task.template_reference_number
+                );
+            });
         }
     
         // Image preview function
         window.openImagePreview = function(imageSrc, title) {
-            // Create modal for larger image view
             const modal = document.createElement('div');
             modal.className = 'fixed inset-0 bg-gray-600 bg-opacity-75 overflow-y-auto h-full w-full z-50 flex items-center justify-center';
             modal.onclick = function(e) {
@@ -563,10 +573,6 @@
         };
     
         // Event Listeners
-        truckSelect.addEventListener('change', function() {
-            loadTemplates();
-        });
-    
         addTaskButton.addEventListener('click', function() {
             addTask();
         });
@@ -581,16 +587,11 @@
             });
         });
     
-        // Load templates on page load if truck is already selected
-        if (truckSelect.value) {
-            loadTemplates();
-        }
-    
-        // Add one empty task by default
-        addTask();
+        // Load templates on page load
+        loadTemplates();
     
         // Form validation
-        document.getElementById('control-form').addEventListener('submit', function(e) {
+        document.getElementById('template-form').addEventListener('submit', function(e) {
             const tasks = tasksContainer.querySelectorAll('.task-item');
             let hasValidTask = false;
             

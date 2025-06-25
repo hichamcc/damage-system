@@ -1,6 +1,6 @@
 @extends('components.layouts.app')
 
-@section('title', 'Control Details - Admin')
+@section('title', 'Control Details')
 
 @section('content')
 <div class="p-6">
@@ -9,7 +9,7 @@
         <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
             <div class="flex items-center space-x-4">
                 <div>
-                    <h3 class="text-xl font-semibold text-gray-900">Control Details - Admin View</h3>
+                    <h3 class="text-xl font-semibold text-gray-900">Control Details</h3>
                     <p class="text-sm text-gray-600 mt-1">{{ $controlLine->truck->license_plate }} - {{ $controlLine->truck->make }} {{ $controlLine->truck->model }}</p>
                 </div>
                 @if($controlLine->status === 'active')
@@ -29,44 +29,71 @@
                 @endif
             </div>
             <div class="flex space-x-3">
-                @php
-                    $hasStartCheck = $controlLine->tasks()
-                        ->whereHas('completions', function($query) {
-                            $query->where('check_type', 'start');
-                        })->exists();
-                    
-                    $hasExitCheck = $controlLine->tasks()
-                        ->whereHas('completions', function($query) {
-                            $query->where('check_type', 'exit');
-                        })->exists();
-                @endphp
+                @if($controlLine->status === 'active')
+                    @php
+                        $hasStartCheck = $controlLine->tasks()
+                            ->whereHas('completions', function($query) {
+                                $query->where('check_type', 'start');
+                            })->exists();
+                        
+                        $hasExitCheck = $controlLine->tasks()
+                            ->whereHas('completions', function($query) {
+                                $query->where('check_type', 'exit');
+                            })->exists();
+                    @endphp
 
-                @if($hasStartCheck && $hasExitCheck)
-                    <a href="{{ route('admin.control.compare', $controlLine) }}" 
-                       class="inline-flex items-center px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-md transition duration-150 ease-in-out">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                    @if(!$hasStartCheck)
+                        <a href="{{ route('user.control.start', $controlLine) }}" 
+                           class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-md transition duration-150 ease-in-out">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1.586a1 1 0 01.707.293l2.414 2.414a1 1 0 00.707.293H15M9 10V9a3 3 0 013-3v.5a.5.5 0 01-.5.5H11V7a1 1 0 011-1h2"/>
+                            </svg>
+                            Start Check
+                        </a>
+                    @elseif($hasStartCheck && !$hasExitCheck)
+                        <div class="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-500 text-sm font-medium rounded-md">
+                            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                            Start Check Completed
+                        </div>
+                        <a href="{{ route('user.control.exit', $controlLine) }}" 
+                           class="inline-flex items-center px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white text-sm font-medium rounded-md transition duration-150 ease-in-out">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                            </svg>
+                            Exit Check
+                        </a>
+                    @elseif(!$hasExitCheck)
+                        <a href="{{ route('user.control.exit', $controlLine) }}" 
+                           class="inline-flex items-center px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white text-sm font-medium rounded-md transition duration-150 ease-in-out">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                            </svg>
+                            Exit Check
+                        </a>
+                    @else
+                        <div class="inline-flex items-center px-4 py-2 bg-green-100 text-green-700 text-sm font-medium rounded-md">
+                            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                            All Checks Completed
+                        </div>
+                    @endif
+                @elseif($controlLine->status === 'completed')
+                    <div class="inline-flex items-center px-4 py-2 bg-green-100 text-green-700 text-sm font-medium rounded-md">
+                        <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                         </svg>
-                        Compare Checks
-                    </a>
+                        Control Completed
+                    </div>
                 @endif
-
-                @if($controlLine->damageReports->count() > 0)
-                    <a href="{{ route('admin.control.damages', $controlLine) }}" 
-                       class="inline-flex items-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-md transition duration-150 ease-in-out">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/>
-                        </svg>
-                        View Damages ({{ $controlLine->damageReports->count() }})
-                    </a>
-                @endif
-
-                <a href="{{ route('admin.control.index') }}" 
+                <a href="{{ route('user.control.index') }}" 
                    class="inline-flex items-center px-4 py-2 border border-gray-300 hover:bg-gray-50 text-gray-700 text-sm font-medium rounded-md transition duration-150 ease-in-out">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
                     </svg>
-                    Back to Controls
+                    Back to Dashboard
                 </a>
             </div>
         </div>
@@ -77,40 +104,23 @@
                 <!-- Control Details -->
                 <div class="lg:col-span-2">
                     <div class="bg-gray-50 rounded-lg p-4 space-y-4">
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <dt class="text-sm font-medium text-gray-500">Template</dt>
-                                <dd class="text-lg font-medium text-gray-900">{{ $controlLine->controlTemplate->name }}</dd>
-                                @if($controlLine->controlTemplate->description)
-                                    <dd class="text-sm text-gray-600">{{ $controlLine->controlTemplate->description }}</dd>
-                                @endif
-                            </div>
-                            <div>
-                                <dt class="text-sm font-medium text-gray-500">Assigned User</dt>
-                                <dd class="text-lg font-medium text-gray-900">{{ $controlLine->assignedUser->name }}</dd>
-                                <dd class="text-sm text-gray-600">{{ $controlLine->assignedUser->email }}</dd>
-                            </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Template</dt>
+                            <dd class="text-lg font-medium text-gray-900">{{ $controlLine->controlTemplate->name }}</dd>
+                            @if($controlLine->controlTemplate->description)
+                                <dd class="text-sm text-gray-600">{{ $controlLine->controlTemplate->description }}</dd>
+                            @endif
                         </div>
                         
-                        <div class="grid grid-cols-3 gap-4">
+                        <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <dt class="text-sm font-medium text-gray-500">Created</dt>
                                 <dd class="text-gray-900">{{ $controlLine->created_at->format('M j, Y \a\t g:i A') }}</dd>
-                                <dd class="text-xs text-gray-500">by {{ $controlLine->createdBy->name }}</dd>
                             </div>
                             <div>
                                 <dt class="text-sm font-medium text-gray-500">Assigned Date</dt>
                                 <dd class="text-gray-900">{{ $controlLine->assigned_at->format('M j, Y \a\t g:i A') }}</dd>
                             </div>
-                            @if($controlLine->completed_at)
-                                <div>
-                                    <dt class="text-sm font-medium text-gray-500">Completed</dt>
-                                    <dd class="text-gray-900">{{ $controlLine->completed_at->format('M j, Y \a\t g:i A') }}</dd>
-                                    <dd class="text-xs text-green-600">
-                                        Duration: {{ $controlLine->assigned_at->diffForHumans($controlLine->completed_at, true) }}
-                                    </dd>
-                                </div>
-                            @endif
                         </div>
 
                         @if($controlLine->notes)
@@ -124,7 +134,7 @@
 
                 <!-- Progress Stats -->
                 <div>
-                    <h4 class="text-sm font-medium text-gray-500 uppercase tracking-wider mb-2">Admin Overview</h4>
+                    <h4 class="text-sm font-medium text-gray-500 uppercase tracking-wider mb-2">Progress</h4>
                     <div class="space-y-4">
                         <!-- Total Tasks -->
                         <div class="bg-blue-50 rounded-lg p-4 border border-blue-200">
@@ -154,6 +164,22 @@
                                         return $task->completions->count() > 0;
                                     })->count() }}</div>
                                     <div class="text-sm text-green-800">Tasks Completed</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pending Tasks -->
+                        <div class="bg-yellow-50 rounded-lg p-4 border border-yellow-200">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0">
+                                    <svg class="h-6 w-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                </div>
+                                <div class="ml-3">
+                                    <div class="text-sm text-yellow-800">{{ $controlLine->tasks->filter(function($task) {
+                                        return $task->completions->count() === 0;
+                                    })->count() }} Tasks Pending</div>
                                 </div>
                             </div>
                         </div>
@@ -188,51 +214,26 @@
                                 $query->where('check_type', 'exit');
                             })->count();
                         @endphp
-                        <div class="bg-purple-50 rounded-lg p-4 border border-purple-200">
-                            <h5 class="text-sm font-medium text-purple-900 mb-3">Check Progress</h5>
+                        <div class="bg-blue-50 rounded-lg p-4 border border-blue-200">
+                            <h5 class="text-sm font-medium text-blue-900 mb-3">Check Progress</h5>
                             <div class="space-y-2">
                                 <div class="flex justify-between items-center">
-                                    <span class="text-sm text-purple-800">Start Checks:</span>
-                                    <span class="text-sm font-medium text-purple-900">{{ $startChecksCount }}/{{ $controlLine->tasks->count() }}</span>
+                                    <span class="text-sm text-blue-800">Start Checks:</span>
+                                    <span class="text-sm font-medium text-blue-900">{{ $startChecksCount }}/{{ $controlLine->tasks->count() }}</span>
                                 </div>
-                                <div class="w-full bg-purple-200 rounded-full h-2">
-                                    <div class="bg-green-600 h-2 rounded-full" style="width: {{ $controlLine->tasks->count() > 0 ? round(($startChecksCount / $controlLine->tasks->count()) * 100) : 0 }}%"></div>
+                                <div class="w-full bg-blue-200 rounded-full h-2">
+                                    <div class="bg-blue-600 h-2 rounded-full" style="width: {{ $controlLine->tasks->count() > 0 ? round(($startChecksCount / $controlLine->tasks->count()) * 100) : 0 }}%"></div>
                                 </div>
                                 
                                 <div class="flex justify-between items-center">
-                                    <span class="text-sm text-purple-800">Exit Checks:</span>
-                                    <span class="text-sm font-medium text-purple-900">{{ $exitChecksCount }}/{{ $controlLine->tasks->count() }}</span>
+                                    <span class="text-sm text-blue-800">Exit Checks:</span>
+                                    <span class="text-sm font-medium text-blue-900">{{ $exitChecksCount }}/{{ $controlLine->tasks->count() }}</span>
                                 </div>
-                                <div class="w-full bg-purple-200 rounded-full h-2">
+                                <div class="w-full bg-blue-200 rounded-full h-2">
                                     <div class="bg-orange-600 h-2 rounded-full" style="width: {{ $controlLine->tasks->count() > 0 ? round(($exitChecksCount / $controlLine->tasks->count()) * 100) : 0 }}%"></div>
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Damage Reports Summary -->
-                        @if($controlLine->damageReports->count() > 0)
-                            <div class="bg-yellow-50 rounded-lg p-4 border border-yellow-200">
-                                <div class="flex items-center">
-                                    <div class="flex-shrink-0">
-                                        <svg class="h-6 w-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/>
-                                        </svg>
-                                    </div>
-                                    <div class="ml-3">
-                                        <div class="text-xl font-bold text-yellow-600">{{ $controlLine->damageReports->count() }}</div>
-                                        <div class="text-sm text-yellow-800">Damage Reports</div>
-                                    </div>
-                                </div>
-                                <div class="mt-2 text-xs text-yellow-700">
-                                    @php
-                                        $statusCounts = $controlLine->damageReports->groupBy('status')->map->count();
-                                    @endphp
-                                    @foreach($statusCounts as $status => $count)
-                                        <span class="inline-block mr-2">{{ ucfirst(str_replace('_', ' ', $status)) }}: {{ $count }}</span>
-                                    @endforeach
-                                </div>
-                            </div>
-                        @endif
                     </div>
                 </div>
             </div>
@@ -241,42 +242,20 @@
 
     <!-- Tasks List -->
     <div class="bg-white rounded-lg shadow mb-6">
-        <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-            <h4 class="text-lg font-medium text-gray-900">Control Tasks ({{ $controlLine->tasks->count() }})</h4>
-            <!-- Filter buttons -->
-            <div class="flex space-x-2">
-                <button onclick="filterTasks('all')" class="task-filter-btn px-3 py-1 text-sm rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors" data-filter="all">
-                    All Tasks
-                </button>
-                <button onclick="filterTasks('completed')" class="task-filter-btn px-3 py-1 text-sm rounded-md bg-green-100 text-green-700 hover:bg-green-200 transition-colors" data-filter="completed">
-                    Completed
-                </button>
-                <button onclick="filterTasks('pending')" class="task-filter-btn px-3 py-1 text-sm rounded-md bg-yellow-100 text-yellow-700 hover:bg-yellow-200 transition-colors" data-filter="pending">
-                    Pending
-                </button>
-                <button onclick="filterTasks('issues')" class="task-filter-btn px-3 py-1 text-sm rounded-md bg-red-100 text-red-700 hover:bg-red-200 transition-colors" data-filter="issues">
-                    With Issues
-                </button>
-            </div>
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h4 class="text-lg font-medium text-gray-900">Control Tasks</h4>
         </div>
         
         @if($controlLine->tasks->count() > 0)
             <div class="divide-y divide-gray-100">
                 @foreach($controlLine->tasks as $task)
-                    @php
-                        $hasIssues = $task->completions->whereIn('status', ['issue', 'missing', 'damaged'])->count() > 0;
-                        $isCompleted = $task->completions->count() > 0;
-                        $isPending = $task->completions->count() === 0;
-                    @endphp
-                    <div class="task-item p-6 {{ $isCompleted ? 'bg-green-50' : '' }}" 
-                         data-status="{{ $isCompleted ? 'completed' : 'pending' }}" 
-                         data-has-issues="{{ $hasIssues ? 'true' : 'false' }}">
+                    <div class="p-6 {{ $task->status === 'completed' ? 'bg-green-50' : '' }}">
                         <div class="flex items-start space-x-4">
                             <!-- Task Number -->
                             <div class="flex-shrink-0">
-                                <span class="inline-flex items-center justify-center w-10 h-10 {{ $isCompleted ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800' }} rounded-full text-sm font-medium">
-                                    @if($isCompleted)
-                                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                <span class="inline-flex items-center justify-center w-8 h-8 {{ $task->status === 'completed' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800' }} rounded-full text-sm font-medium">
+                                    @if($task->status === 'completed')
+                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                             <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
                                         </svg>
                                     @else
@@ -315,21 +294,12 @@
                                                     @endif
                                                 </span>
                                             @endif
-
-                                            @if($hasIssues)
-                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                                                    <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-                                                    </svg>
-                                                    Has Issues
-                                                </span>
-                                            @endif
                                         </div>
 
                                         <!-- Task Completions -->
                                         @if($task->completions->count() > 0)
-                                            <div class="bg-gray-50 rounded-lg p-4 mt-3">
-                                                <h6 class="text-sm font-medium text-gray-700 mb-3">Check History ({{ $task->completions->count() }} checks)</h6>
+                                            <div class="bg-gray-50 rounded-lg p-3 mt-3">
+                                                <h6 class="text-sm font-medium text-gray-700 mb-3">Check History</h6>
                                                 <div class="space-y-3">
                                                     @foreach($task->completions as $completion)
                                                         <div class="border border-gray-200 rounded-lg p-3 bg-white">
@@ -448,19 +418,15 @@
         @endif
     </div>
 
-    <!-- Recent Damage Reports Summary -->
+    <!-- Damage Reports -->
     @if($controlLine->damageReports->count() > 0)
         <div class="bg-white rounded-lg shadow">
-            <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-                <h4 class="text-lg font-medium text-gray-900">Recent Damage Reports ({{ $controlLine->damageReports->count() }})</h4>
-                <a href="{{ route('admin.control.damages', $controlLine) }}" 
-                   class="text-blue-600 hover:text-blue-900 text-sm font-medium">
-                    View All Damages →
-                </a>
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h4 class="text-lg font-medium text-gray-900">Damage Reports</h4>
             </div>
             
             <div class="divide-y divide-gray-100">
-                @foreach($controlLine->damageReports->take(3) as $damage)
+                @foreach($controlLine->damageReports as $damage)
                     <div class="p-6">
                         <div class="flex items-start space-x-4">
                             <div class="flex-shrink-0">
@@ -469,97 +435,21 @@
                                 </span>
                             </div>
                             <div class="flex-1">
-                                <div class="flex items-start justify-between">
-                                    <div>
-                                        <h5 class="font-medium text-gray-900">{{ $damage->damage_type ?? 'Damage Report' }}</h5>
-                                        <p class="text-gray-600 mt-1">{{ Str::limit($damage->description, 100) }}</p>
-                                        <div class="text-sm text-gray-500 mt-2">
-                                            Reported by {{ $damage->reportedBy->name }} on {{ $damage->created_at->format('M j, Y \a\t g:i A') }}
-                                        </div>
-                                        @if($damage->damage_area)
-                                            <div class="text-xs text-gray-600 mt-1">
-                                                <span class="font-medium">Area:</span> {{ $damage->damage_area }}
-                                            </div>
-                                        @endif
-                                    </div>
-                                    <div class="flex space-x-2">
-                                        @if($damage->status !== 'fixed')
-                                            <form method="POST" action="{{ route('admin.damages.update-status', $damage) }}" class="inline">
-                                                @csrf
-                                                @method('PATCH')
-                                                <input type="hidden" name="status" value="{{ $damage->status === 'reported' ? 'in_repair' : 'fixed' }}">
-                                                <button type="submit" class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded hover:bg-blue-200 transition-colors">
-                                                    Mark as {{ $damage->status === 'reported' ? 'In Repair' : 'Fixed' }}
-                                                </button>
-                                            </form>
-                                        @endif
-                                        <a href="{{ route('admin.damages.show', $damage) }}" 
-                                           class="text-xs bg-gray-100 text-gray-800 px-2 py-1 rounded hover:bg-gray-200 transition-colors">
-                                            View Details
-                                        </a>
-                                    </div>
+                                <h5 class="font-medium text-gray-900">{{ $damage->damage_type ?? 'Damage Report' }}</h5>
+                                <p class="text-gray-600 mt-1">{{ $damage->description }}</p>
+                                <div class="text-sm text-gray-500 mt-2">
+                                    Reported by {{ $damage->reportedBy->name }} on {{ $damage->created_at->format('M j, Y \a\t g:i A') }}
                                 </div>
                             </div>
                         </div>
                     </div>
                 @endforeach
-                
-                @if($controlLine->damageReports->count() > 3)
-                    <div class="px-6 py-3 bg-gray-50 text-center">
-                        <a href="{{ route('admin.control.damages', $controlLine) }}" 
-                           class="text-sm text-blue-600 hover:text-blue-900 font-medium">
-                            View {{ $controlLine->damageReports->count() - 3 }} more damage reports →
-                        </a>
-                    </div>
-                @endif
             </div>
         </div>
     @endif
-
 </div>
 
 <script>
-    // Task filtering functionality
-    function filterTasks(filter) {
-        const taskItems = document.querySelectorAll('.task-item');
-        const filterButtons = document.querySelectorAll('.task-filter-btn');
-        
-        // Update button states
-        filterButtons.forEach(btn => {
-            btn.classList.remove('bg-blue-600', 'text-white');
-            btn.classList.add('bg-gray-100', 'text-gray-700');
-        });
-        
-        const activeButton = document.querySelector(`[data-filter="${filter}"]`);
-        activeButton.classList.remove('bg-gray-100', 'text-gray-700');
-        activeButton.classList.add('bg-blue-600', 'text-white');
-        
-        // Filter tasks
-        taskItems.forEach(item => {
-            const status = item.dataset.status;
-            const hasIssues = item.dataset.hasIssues === 'true';
-            
-            let show = false;
-            
-            switch(filter) {
-                case 'all':
-                    show = true;
-                    break;
-                case 'completed':
-                    show = status === 'completed';
-                    break;
-                case 'pending':
-                    show = status === 'pending';
-                    break;
-                case 'issues':
-                    show = hasIssues;
-                    break;
-            }
-            
-            item.style.display = show ? 'block' : 'none';
-        });
-    }
-
     // Enhanced image preview function
     function openImagePreview(imageSrc, title) {
         const modal = document.createElement('div');
@@ -616,30 +506,5 @@
         
         document.body.appendChild(modal);
     }
-
-    // Admin action functions
-    function openNotificationModal() {
-        // Implementation for notification modal
-        alert('Notification feature would be implemented here');
-    }
-
-    function confirmForceComplete() {
-        if (confirm('Are you sure you want to force complete this control? This action cannot be undone.')) {
-            // Implementation for force complete
-            alert('Force complete feature would be implemented here');
-        }
-    }
-
-    function confirmReassign() {
-        if (confirm('Are you sure you want to reassign this control to another user?')) {
-            // Implementation for reassignment
-            alert('Reassignment feature would be implemented here');
-        }
-    }
-
-    // Initialize with 'all' filter active
-    document.addEventListener('DOMContentLoaded', function() {
-        filterTasks('all');
-    });
 </script>
 @endsection

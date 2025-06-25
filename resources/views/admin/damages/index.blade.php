@@ -1,338 +1,316 @@
 @extends('components.layouts.app')
 
-@section('title', 'All Damage Reports')
+@section('title', 'Damage Reports')
 
 @section('content')
 <div class="p-6">
-    <!-- Header -->
-    <div class="mb-8">
-        <div class="flex justify-between items-center">
-            <div>
-                <h1 class="text-2xl font-bold text-gray-900">All Damage Reports</h1>
-                <p class="text-gray-600">Manage damage reports across all vehicle controls</p>
-            </div>
-            <div class="flex space-x-2">
-                <a href="{{ route('admin.control.index') }}" 
-                   class="inline-flex items-center px-4 py-2 border border-gray-300 hover:bg-gray-50 text-gray-700 text-sm font-medium rounded-md transition duration-150 ease-in-out">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                    </svg>
-                    Controls
-                </a>
-                <a href="{{ route('dashboard') }}" 
-                   class="inline-flex items-center px-4 py-2 border border-gray-300 hover:bg-gray-50 text-gray-700 text-sm font-medium rounded-md transition duration-150 ease-in-out">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"/>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5a2 2 0 012-2h2a2 2 0 012 2v2H8V5z"/>
-                    </svg>
-                    Dashboard
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <!-- Stats Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <div class="bg-white rounded-lg shadow p-6">
-            <div class="flex items-center">
-                <div class="flex-shrink-0">
-                    <div class="w-8 h-8 bg-gray-500 rounded-lg flex items-center justify-center">
-                        <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-                        </svg>
-                    </div>
-                </div>
-                <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-600">Total Reports</p>
-                    <p class="text-2xl font-semibold text-gray-900">{{ $stats['total'] }}</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="bg-white rounded-lg shadow p-6">
-            <div class="flex items-center">
-                <div class="flex-shrink-0">
-                    <div class="w-8 h-8 bg-red-500 rounded-lg flex items-center justify-center">
-                        <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-                        </svg>
-                    </div>
-                </div>
-                <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-600">Open Reports</p>
-                    <p class="text-2xl font-semibold text-gray-900">{{ $stats['reported'] }}</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="bg-white rounded-lg shadow p-6">
-            <div class="flex items-center">
-                <div class="flex-shrink-0">
-                    <div class="w-8 h-8 bg-yellow-500 rounded-lg flex items-center justify-center">
-                        <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" clip-rule="evenodd"/>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                        </svg>
-                    </div>
-                </div>
-                <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-600">In Repair</p>
-                    <p class="text-2xl font-semibold text-gray-900">{{ $stats['in_repair'] }}</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="bg-white rounded-lg shadow p-6">
-            <div class="flex items-center">
-                <div class="flex-shrink-0">
-                    <div class="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
-                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                    </div>
-                </div>
-                <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-600">Fixed</p>
-                    <p class="text-2xl font-semibold text-gray-900">{{ $stats['fixed'] }}</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Filters -->
+    <!-- Header Section -->
     <div class="bg-white rounded-lg shadow mb-6">
-        <div class="p-4">
-            <div class="flex flex-wrap gap-4 items-center">
-                <div class="flex items-center space-x-2">
-                    <span class="text-sm font-medium text-gray-700">Status:</span>
-                    <select id="status-filter" class="border border-gray-300 rounded-md px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <option value="">All Status</option>
-                        <option value="reported">Reported</option>
-                        <option value="in_repair">In Repair</option>
-                        <option value="fixed">Fixed</option>
-                    </select>
+        <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+            <div>
+                <h3 class="text-lg font-medium text-gray-900">Damage Reports Management</h3>
+                <p class="text-sm text-gray-600">Monitor and manage all damage reports across all controls</p>
+            </div>
+        </div>
+
+        <!-- Stats Section -->
+        <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="text-center">
+                    <div class="text-2xl font-bold text-gray-600">{{ $stats['total'] }}</div>
+                    <div class="text-sm text-gray-600">Total Reports</div>
                 </div>
-                
-                <div class="flex items-center space-x-2">
-                    <span class="text-sm font-medium text-gray-700">Severity:</span>
-                    <select id="severity-filter" class="border border-gray-300 rounded-md px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <option value="">All Severity</option>
-                        <option value="minor">Minor</option>
-                        <option value="major">Major</option>
-                        <option value="critical">Critical</option>
-                    </select>
+                <div class="text-center">
+                    <div class="text-2xl font-bold text-blue-600">{{ $stats['reported'] }}</div>
+                    <div class="text-sm text-gray-600">Newly Reported</div>
                 </div>
-                
-                <div class="flex items-center space-x-2">
-                    <span class="text-sm font-medium text-gray-700">Vehicle:</span>
-                    <input type="text" id="vehicle-filter" placeholder="License plate..." 
-                           class="border border-gray-300 rounded-md px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <div class="text-center">
+                    <div class="text-2xl font-bold text-yellow-600">{{ $stats['in_repair'] }}</div>
+                    <div class="text-sm text-gray-600">In Repair</div>
                 </div>
-                
-                <div class="flex items-center space-x-2">
-                    <span class="text-sm font-medium text-gray-700">Search:</span>
-                    <input type="text" id="search-input" placeholder="Search description..." 
-                           class="border border-gray-300 rounded-md px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <div class="text-center">
+                    <div class="text-2xl font-bold text-green-600">{{ $stats['fixed'] }}</div>
+                    <div class="text-sm text-gray-600">Fixed</div>
                 </div>
             </div>
         </div>
+
+        <!-- Filters Section -->
+        <div class="p-6">
+            <form method="GET" class="grid grid-cols-1 md:grid-cols-6 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                    <select name="status" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm">
+                        <option value="">All Status</option>
+                        <option value="reported" {{ request('status') == 'reported' ? 'selected' : '' }}>Reported</option>
+                        <option value="in_repair" {{ request('status') == 'in_repair' ? 'selected' : '' }}>In Repair</option>
+                        <option value="fixed" {{ request('status') == 'fixed' ? 'selected' : '' }}>Fixed</option>
+                        <option value="ignored" {{ request('status') == 'ignored' ? 'selected' : '' }}>Ignored</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Severity</label>
+                    <select name="severity" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm">
+                        <option value="">All Severities</option>
+                        <option value="minor" {{ request('severity') == 'minor' ? 'selected' : '' }}>Minor</option>
+                        <option value="major" {{ request('severity') == 'major' ? 'selected' : '' }}>Major</option>
+                        <option value="critical" {{ request('severity') == 'critical' ? 'selected' : '' }}>Critical</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Truck</label>
+                    <select name="truck_id" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm">
+                        <option value="">All Trucks</option>
+                        @foreach(\App\Models\Truck::all() as $truck)
+                            <option value="{{ $truck->id }}" {{ request('truck_id') == $truck->id ? 'selected' : '' }}>
+                                {{ $truck->license_plate }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Date From</label>
+                    <input type="date" name="date_from" value="{{ request('date_from') }}" 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Date To</label>
+                    <input type="date" name="date_to" value="{{ request('date_to') }}" 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm">
+                </div>
+                <div class="flex items-end">
+                    <button type="submit" class="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md">
+                        Filter
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 
-    <!-- Damages Table -->
+    <!-- Damage Reports Table -->
     <div class="bg-white rounded-lg shadow">
         <div class="px-6 py-4 border-b border-gray-200">
-            <h3 class="text-lg font-medium text-gray-900">Damage Reports</h3>
+            <h4 class="text-md font-medium text-gray-900">Damage Reports ({{ $damages->total() }})</h4>
         </div>
-        
-        <div class="overflow-hidden">
-            @if($damages->count() > 0)
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Damage</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vehicle</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Control</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reporter</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Severity</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
-                            @foreach($damages as $damage)
-                                <tr class="hover:bg-gray-50 damage-row" 
-                                    data-status="{{ $damage->status }}" 
-                                    data-severity="{{ $damage->severity }}"
-                                    data-vehicle="{{ strtolower($damage->controlLine->truck->license_plate) }}"
-                                    data-search="{{ strtolower($damage->damage_location . ' ' . $damage->damage_description) }}">
-                                    
-                                    <!-- Damage Info -->
-                                    <td class="px-6 py-4">
-                                        <div class="flex items-start">
-                                            <div class="flex-shrink-0 mr-3">
-                                                @if($damage->severity === 'critical')
-                                                    <div class="w-8 h-8 bg-red-500 rounded-lg flex items-center justify-center">
-                                                        <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-                                                        </svg>
-                                                    </div>
-                                                @elseif($damage->severity === 'major')
-                                                    <div class="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
-                                                        <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-                                                        </svg>
-                                                    </div>
-                                                @else
-                                                    <div class="w-8 h-8 bg-yellow-500 rounded-lg flex items-center justify-center">
-                                                        <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
-                                                        </svg>
-                                                    </div>
-                                                @endif
-                                            </div>
-                                            <div>
-                                                <div class="text-sm font-medium text-gray-900">{{ $damage->damage_location }}</div>
-                                                <div class="text-sm text-gray-500">{{ Str::limit($damage->damage_description, 50) }}</div>
-                                                @if($damage->damage_area)
-                                                    <div class="text-xs text-orange-600 mt-1 font-medium">
-                                                        📍 {{ $damage->damage_area_display }}
-                                                    </div>
-                                                @endif
-                                                @if($damage->controlTask)
-                                                    <div class="text-xs text-gray-400 mt-1">Task: {{ $damage->controlTask->title }}</div>
-                                                @endif
-                                            </div>
-                                        </div>
-                                    </td>
 
-                                    <!-- Vehicle -->
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm font-medium text-gray-900">{{ $damage->controlLine->truck->license_plate }}</div>
-                                        <div class="text-sm text-gray-500">{{ $damage->controlLine->truck->make }} {{ $damage->controlLine->truck->model }}</div>
-                                    </td>
-
-                                    <!-- Control -->
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <a href="{{ route('admin.control.show', $damage->controlLine) }}" 
-                                           class="text-sm font-medium text-blue-600 hover:text-blue-500">
-                                            Control #{{ $damage->controlLine->id }}
-                                        </a>
-                                    </td>
-
-                                    <!-- Reporter -->
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-gray-900">{{ $damage->reportedBy->name }}</div>
-                                        <div class="text-sm text-gray-500">{{ $damage->reportedBy->email }}</div>
-                                    </td>
-
-                                    <!-- Severity -->
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                            @if($damage->severity === 'critical') bg-red-100 text-red-800
-                                            @elseif($damage->severity === 'major') bg-orange-100 text-orange-800
-                                            @else bg-yellow-100 text-yellow-800
-                                            @endif">
-                                            {{ ucfirst($damage->severity) }}
-                                        </span>
-                                    </td>
-
-                                    <!-- Status -->
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                            @if($damage->status === 'reported') bg-red-100 text-red-800
-                                            @elseif($damage->status === 'in_repair') bg-yellow-100 text-yellow-800
-                                            @elseif($damage->status === 'fixed') bg-green-100 text-green-800
-                                            @else bg-gray-100 text-gray-800
-                                            @endif">
-                                            {{ ucfirst(str_replace('_', ' ', $damage->status)) }}
-                                        </span>
-                                    </td>
-
-                                    <!-- Date -->
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-gray-900">{{ $damage->created_at->format('M d, Y') }}</div>
-                                        <div class="text-sm text-gray-500">{{ $damage->created_at->format('H:i') }}</div>
-                                    </td>
-
-                                    <!-- Actions -->
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                        <div class="flex items-center space-x-2">
-                                            <a href="{{ route('admin.control.damages', $damage->controlLine) }}" 
-                                               class="text-blue-600 hover:text-blue-500">View</a>
-                                            
-                                            @if($damage->status !== 'fixed')
-                                                <button type="button" onclick="openMarkFixedModal({{ $damage->id }})" 
-                                                        class="text-green-600 hover:text-green-500">Fix</button>
+        @if($damages->count() > 0)
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Damage Info</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Truck & Control</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status & Severity</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reported</th>
+                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        @foreach($damages as $damage)
+                            <tr class="hover:bg-gray-50">
+                                <!-- Damage Info -->
+                                <td class="px-6 py-4">
+                                    <div class="flex items-start space-x-3">
+                                        <div class="flex-shrink-0">
+                                            @if($damage->damage_photos && count($damage->getPhotoUrls()) > 0)
+                                                <div class="w-12 h-12 rounded-lg overflow-hidden border border-gray-200">
+                                                    <img src="{{ $damage->getPhotoUrls()[0]['url'] }}" 
+                                                         alt="Damage photo"
+                                                         class="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform"
+                                                         onclick="openImagePreview('{{ $damage->getPhotoUrls()[0]['url'] }}', 'Damage Photo')">
+                                                </div>
+                                            @else
+                                                <div class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
+                                                    <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                                    </svg>
+                                                </div>
                                             @endif
                                         </div>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
+                                        <div class="flex-1 min-w-0">
+                                            <div class="text-sm font-medium text-gray-900">
+                                                {{ $damage->damage_location ?? 'Damage Report' }}
+                                            </div>
+                                            <div class="text-sm text-gray-600 mt-1">
+                                                {{ Str::limit($damage->damage_description, 80) }}
+                                            </div>
+                                            @if($damage->damage_area)
+                                                <div class="text-xs text-blue-600 mt-1">
+                                                    <svg class="w-3 h-3 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                                    </svg>
+                                                    Area: {{ $damage->damage_area }}
+                                                </div>
+                                            @endif
+                                            @if($damage->damage_photos && count($damage->getPhotoUrls()) > 1)
+                                                <div class="text-xs text-gray-500 mt-1">
+                                                    +{{ count($damage->getPhotoUrls()) - 1 }} more photos
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </td>
 
-                <!-- Pagination -->
-                <div class="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
-                    {{ $damages->links() }}
-                </div>
-            @else
-                <div class="text-center py-12">
-                    <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                    <h3 class="text-lg font-medium text-gray-900 mb-2">No damage reports found</h3>
-                    <p class="text-gray-500">There are no damage reports in the system yet.</p>
+                                <!-- Truck & Control -->
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm font-medium text-gray-900">{{ $damage->truck->license_plate }}</div>
+                                    <div class="text-sm text-gray-500">{{ $damage->truck->make }} {{ $damage->truck->model }}</div>
+                                    @if($damage->controlLine)
+                                        <div class="text-xs text-blue-600 mt-1">
+                                            <a href="{{ route('admin.control.show', $damage->controlLine) }}" class="hover:underline">
+                                                Control #{{ $damage->controlLine->id }}
+                                            </a>
+                                        </div>
+                                    @endif
+                                    @if($damage->controlTask)
+                                        <div class="text-xs text-gray-500 mt-1">
+                                            Task: {{ Str::limit($damage->controlTask->title, 30) }}
+                                        </div>
+                                    @endif
+                                </td>
+
+                                <!-- Status & Severity -->
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="space-y-2">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $damage->status_color }}">
+                                            @if($damage->status === 'reported')
+                                                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                                                </svg>
+                                            @elseif($damage->status === 'in_repair')
+                                                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/>
+                                                </svg>
+                                            @elseif($damage->status === 'fixed')
+                                                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                                </svg>
+                                            @endif
+                                            {{ ucfirst(str_replace('_', ' ', $damage->status)) }}
+                                        </span>
+                                        <div>
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $damage->severity_color }}">
+                                                @if($damage->severity === 'critical')
+                                                    <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                                    </svg>
+                                                @elseif($damage->severity === 'major')
+                                                    <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                                                    </svg>
+                                                @else
+                                                    <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 011 1v4a1 1 0 11-2 0V6a1 1 0 011-1z" clip-rule="evenodd"/>
+                                                    </svg>
+                                                @endif
+                                                {{ ucfirst($damage->severity) }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <!-- Reported -->
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    <div>{{ $damage->created_at->format('M j, Y') }}</div>
+                                    <div class="text-xs text-gray-400">{{ $damage->created_at->format('g:i A') }}</div>
+                                    <div class="text-xs text-gray-600 mt-1">by {{ $damage->reportedBy->name }}</div>
+                                    @if($damage->fixed_date)
+                                        <div class="text-xs text-green-600 mt-1">
+                                            Fixed: {{ $damage->fixed_date->format('M j, Y') }}
+                                        </div>
+                                    @endif
+                                </td>
+
+                                <!-- Actions -->
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                    <div class="flex items-center justify-end space-x-2">
+                                        <a href="{{ route('admin.damages.show', $damage) }}" 
+                                           class="text-blue-600 hover:text-blue-900">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                            </svg>
+                                        </a>
+                                        
+                                        @if($damage->status !== 'fixed')
+                                            <div class="relative" x-data="{ open: false }">
+                                                <button @click="open = !open" class="text-gray-600 hover:text-gray-900">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"/>
+                                                    </svg>
+                                                </button>
+                                                <div x-show="open" @click.away="open = false" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 border border-gray-200">
+                                                    @if($damage->status === 'reported')
+                                                        <form method="POST" action="{{ route('admin.damages.update-status', $damage) }}" class="block">
+                                                            @csrf
+                                                            @method('PATCH')
+                                                            <input type="hidden" name="status" value="in_repair">
+                                                            <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                                Mark as In Repair
+                                                            </button>
+                                                        </form>
+                                                    @endif
+                                                        <button onclick="openFixedModal({{ $damage->id }})" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                            Mark as Fixed
+                                                        </button>
+
+                                                </div>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            @if($damages->hasPages())
+                <div class="px-6 py-4 border-t border-gray-200">
+                    {{ $damages->appends(request()->query())->links() }}
                 </div>
             @endif
-        </div>
+        @else
+            <div class="px-6 py-12 text-center">
+                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 48 48">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+                </svg>
+                <h3 class="mt-2 text-sm font-medium text-gray-900">No damage reports found</h3>
+                <p class="mt-1 text-sm text-gray-500">No damage reports match your current filters.</p>
+            </div>
+        @endif
     </div>
 </div>
 
-<!-- Mark as Fixed Modal (reuse from damage reports view) -->
-<div id="mark-fixed-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+<!-- Fixed Modal -->
+<div id="fixedModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 overflow-y-auto h-full w-full z-50 hidden">
     <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
         <div class="mt-3">
-            <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-medium text-gray-900">Mark Damage as Fixed</h3>
-                <button type="button" onclick="closeMarkFixedModal()" class="text-gray-400 hover:text-gray-600">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                    </svg>
-                </button>
-            </div>
-            
-            <form id="mark-fixed-form" method="POST">
+            <h3 class="text-lg font-medium text-gray-900 mb-4">Mark Damage as Fixed</h3>
+            <form id="fixedForm" method="POST">
                 @csrf
                 @method('PATCH')
-                
                 <div class="mb-4">
-                    <label for="fixed_date" class="block text-sm font-medium text-gray-700 mb-2">
-                        Fixed Date <span class="text-red-500">*</span>
-                    </label>
-                    <input type="date" id="fixed_date" name="fixed_date" required
-                           value="{{ date('Y-m-d') }}"
-                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Fixed Date</label>
+                    <input type="date" name="fixed_date" required 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md" 
+                           value="{{ date('Y-m-d') }}">
                 </div>
-                
-                <div class="mb-6">
-                    <label for="repair_notes" class="block text-sm font-medium text-gray-700 mb-2">
-                        Repair Notes
-                    </label>
-                    <textarea id="repair_notes" name="repair_notes" rows="3"
-                              placeholder="Describe the repair work done..."
-                              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"></textarea>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Repair Notes</label>
+                    <textarea name="repair_notes" rows="3" 
+                              class="w-full px-3 py-2 border border-gray-300 rounded-md"
+                              placeholder="Optional repair details..."></textarea>
                 </div>
-                
                 <div class="flex justify-end space-x-3">
-                    <button type="button" onclick="closeMarkFixedModal()" 
-                            class="px-4 py-2 border border-gray-300 hover:bg-gray-50 text-gray-700 text-sm font-medium rounded-md transition duration-150 ease-in-out">
+                    <button type="button" onclick="closeFixedModal()" 
+                            class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400">
                         Cancel
                     </button>
                     <button type="submit" 
-                            class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-md transition duration-150 ease-in-out">
+                            class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
                         Mark as Fixed
                     </button>
                 </div>
@@ -342,69 +320,43 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const statusFilter = document.getElementById('status-filter');
-    const severityFilter = document.getElementById('severity-filter');
-    const vehicleFilter = document.getElementById('vehicle-filter');
-    const searchInput = document.getElementById('search-input');
-    const damageRows = document.querySelectorAll('.damage-row');
-
-    function applyFilters() {
-        const statusValue = statusFilter.value.toLowerCase();
-        const severityValue = severityFilter.value.toLowerCase();
-        const vehicleValue = vehicleFilter.value.toLowerCase();
-        const searchValue = searchInput.value.toLowerCase();
-
-        damageRows.forEach(row => {
-            let show = true;
-
-            // Status filter
-            if (statusValue && row.dataset.status !== statusValue) {
-                show = false;
+    function openImagePreview(imageSrc, title) {
+        const modal = document.createElement('div');
+        modal.className = 'fixed inset-0 bg-gray-900 bg-opacity-75 overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4';
+        modal.onclick = function(e) {
+            if (e.target === this) {
+                document.body.removeChild(this);
             }
-
-            // Severity filter
-            if (severityValue && row.dataset.severity !== severityValue) {
-                show = false;
-            }
-
-            // Vehicle filter
-            if (vehicleValue && !row.dataset.vehicle.includes(vehicleValue)) {
-                show = false;
-            }
-
-            // Search filter
-            if (searchValue && !row.dataset.search.includes(searchValue)) {
-                show = false;
-            }
-
-            row.style.display = show ? '' : 'none';
-        });
+        };
+        
+        modal.innerHTML = `
+            <div class="relative bg-white p-6 rounded-lg max-w-4xl max-h-full overflow-auto shadow-xl">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-semibold text-gray-900">${title}</h3>
+                    <button onclick="document.body.removeChild(this.closest('.fixed'))" class="text-gray-400 hover:text-gray-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="text-center">
+                    <img src="${imageSrc}" alt="${title}" class="max-w-full max-h-96 mx-auto rounded-lg shadow-lg">
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
     }
 
-    statusFilter.addEventListener('change', applyFilters);
-    severityFilter.addEventListener('change', applyFilters);
-    vehicleFilter.addEventListener('input', applyFilters);
-    searchInput.addEventListener('input', applyFilters);
-});
-
-function openMarkFixedModal(damageId) {
-    const modal = document.getElementById('mark-fixed-modal');
-    const form = document.getElementById('mark-fixed-form');
-    form.action = `/admin/damage/${damageId}/mark-fixed`;
-    modal.classList.remove('hidden');
-}
-
-function closeMarkFixedModal() {
-    const modal = document.getElementById('mark-fixed-modal');
-    modal.classList.add('hidden');
-}
-
-// Close modal when clicking outside
-document.getElementById('mark-fixed-modal').addEventListener('click', function(e) {
-    if (e.target === this) {
-        closeMarkFixedModal();
+    function openFixedModal(damageId) {
+        const modal = document.getElementById('fixedModal');
+        const form = document.getElementById('fixedForm');
+        form.action = `/admin/damages/${damageId}/fixed`;
+        modal.classList.remove('hidden');
     }
-});
+
+    function closeFixedModal() {
+        document.getElementById('fixedModal').classList.add('hidden');
+    }
 </script>
 @endsection

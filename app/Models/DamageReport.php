@@ -74,6 +74,8 @@ class DamageReport extends Model
 
     public function getPhotoUrls()
     {
+
+        
         if (!$this->damage_photos) {
             return [];
         }

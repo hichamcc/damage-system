@@ -12,6 +12,7 @@ class ControlLine extends Model
         'truck_id',
         'assigned_user_id',
         'created_by',
+        'control_template_id',  
         'status',
         'assigned_at',
         'start_check_at',
@@ -81,5 +82,13 @@ class ControlLine extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'assigned_user_id');
+    }
+    public function isCompleted()
+    {
+        return $this->status === 'completed';
+    }
+    public function controlTemplate()
+    {
+        return $this->belongsTo(ControlTemplate::class);
     }
 }

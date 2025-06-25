@@ -74,4 +74,9 @@ class Truck extends Model
     {
         return $query->where('status', 'active');
     }
+
+    public function controlLines()
+    {
+        return $this->hasMany(ControlLine::class);
+    }
 }
