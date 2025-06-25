@@ -44,6 +44,9 @@
                     <x-navlist.item before="phosphor-users" :href="route('admin.users.index')" :current="request()->routeIs('admin.users.*')">
                         {{ __('Users') }}
                     </x-navlist.item>
+                    <x-navlist.item before="phosphor-list-numbers" :href="route('admin.truck-numbers.index')" :current="request()->routeIs('admin.truck-numbers.*')">
+                        {{ __('Truck Numbers') }}
+                    </x-navlist.item>
                     <x-navlist.item before="phosphor-truck" :href="route('admin.trucks.index')" :current="request()->routeIs('admin.trucks.*')">
                         {{ __('Trucks') }}
                     </x-navlist.item>
@@ -63,8 +66,12 @@
                         {{ __('Dashboard') }}
                     </x-navlist.item>
                
-                    <x-navlist.item before="phosphor-truck" :href="route('user.control.index')" :current="request()->routeIs('user.control.*')">
+                    <x-navlist.item before="phosphor-check-circle" :href="route('user.control.index')" :current="request()->routeIs('user.control.*')">
                         {{ __('Controls') }}
+                    </x-navlist.item>
+
+                    <x-navlist.item before="phosphor-truck" :href="route('admin.trucks.index')" :current="request()->routeIs('admin.trucks.*')">
+                        {{ __('Trucks') }}
                     </x-navlist.item>
                 </x-navlist.group>
                

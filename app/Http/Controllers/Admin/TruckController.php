@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Truck;
+use App\Models\TruckNumber;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
@@ -16,6 +17,8 @@ class TruckController extends Controller
     public function index(Request $request)
     {
         $query = Truck::query();
+
+       
 
         // Search functionality
         if ($request->filled('search')) {
@@ -51,7 +54,10 @@ class TruckController extends Controller
      */
     public function create()
     {
-        return view('admin.trucks.create');
+         //only get truck numbers that are not in the trucks table
+         $truckNumbers = TruckNumber::whereNotIn('truck_number', Truck::pluck('truck_number'))->get();
+        
+        return view('admin.trucks.create', compact('truckNumbers'));
     }
 
     /**
@@ -87,6 +93,7 @@ class TruckController extends Controller
 
         Truck::create($validated);
 
+      //
         return redirect()->route('admin.trucks.index')
             ->with('success', 'Truck created successfully.');
     }
@@ -104,7 +111,11 @@ class TruckController extends Controller
      */
     public function edit(Truck $truck)
     {
-        return view('admin.trucks.edit', compact('truck'));
+
+        $truckNumbers = TruckNumber::whereNotIn('truck_number', 
+        Truck::where('id', '!=', $truck->id)->pluck('truck_number')
+    )->get();
+            return view('admin.trucks.edit', compact('truck', 'truckNumbers'));
     }
 
     /**

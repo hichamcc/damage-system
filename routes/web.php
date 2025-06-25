@@ -9,6 +9,7 @@ use App\Http\Controllers\User\ControlController;
 use App\Http\Controllers\Admin\TruckTemplateController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\User;
+use App\Http\Controllers\Admin\TruckNumbersController;
 
 
 Route::get('/', function () {
@@ -31,15 +32,7 @@ Route::middleware(['auth'])->group(function () {
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::resource('users', \App\Http\Controllers\Admin\UserController::class);
 
-    // Trucks Management
-    Route::get('trucks', [TruckController::class, 'index'])->name('trucks.index');
-    Route::get('trucks/create', [TruckController::class, 'create'])->name('trucks.create');
-    Route::get('trucks/{truck}', [TruckController::class, 'show'])->name('trucks.show');
-    Route::get('trucks/{truck}/edit', [TruckController::class, 'edit'])->name('trucks.edit');
-    Route::post('trucks', [TruckController::class, 'store'])->name('trucks.store');
-    Route::put('trucks/{truck}', [TruckController::class, 'update'])->name('trucks.update');
-    Route::patch('trucks/{truck}', [TruckController::class, 'update'])->name('trucks.patch');
-    Route::delete('trucks/d/{truck}', [TruckController::class, 'destroy'])->name('trucks.destroy');
+
 
 
     //truck templates
@@ -50,11 +43,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     //truck templates
     Route::resource('truck-templates', TruckTemplateController::class);
     
-    // Additional truck routes for file management
-    Route::delete('trucks/{truck}/attachments/{index}', [TruckController::class, 'removeAttachment'])
-        ->name('trucks.attachments.remove');
-    Route::get('trucks/{truck}/attachments/{index}/download', [TruckController::class, 'downloadAttachment'])
-        ->name('trucks.attachments.download');
+
 
     // Control Templates Management (NEW)
     Route::resource('control-templates', ControlTemplatesController::class);
@@ -73,6 +62,40 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::patch('damages/{damage}/status', [ControlLinesController::class, 'updateDamageStatus'])->name('damages.update-status');
     Route::patch('damages/{damage}/fixed', [ControlLinesController::class, 'markDamageFixed'])->name('damages.mark-fixed');
     Route::delete('damages/{damage}', [ControlLinesController::class, 'deleteDamage'])->name('damages.destroy');
+
+
+    Route::resource('truck-numbers', TruckNumbersController::class);
+    Route::post('truck-numbers/bulk-delete', [TruckNumbersController::class, 'bulkDelete'])->name('truck-numbers.bulk-delete');
+    Route::post('truck-numbers/bulk-import', [TruckNumbersController::class, 'bulkImport'])->name('truck-numbers.bulk-import');
+
+});
+
+//route for user and admi
+Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
+
+        // Trucks Management
+        Route::get('trucks', [TruckController::class, 'index'])->name('trucks.index');
+        Route::get('trucks/create', [TruckController::class, 'create'])->name('trucks.create');
+        Route::get('trucks/{truck}', [TruckController::class, 'show'])->name('trucks.show');
+        Route::get('trucks/{truck}/edit', [TruckController::class, 'edit'])->name('trucks.edit');
+        Route::post('trucks', [TruckController::class, 'store'])->name('trucks.store');
+        Route::put('trucks/{truck}', [TruckController::class, 'update'])->name('trucks.update');
+        Route::patch('trucks/{truck}', [TruckController::class, 'update'])->name('trucks.patch');
+        Route::delete('trucks/d/{truck}', [TruckController::class, 'destroy'])->name('trucks.destroy');
+
+
+        Route::delete('trucks/{truck}/attachments/{index}', [TruckController::class, 'removeAttachment'])
+        ->name('trucks.attachments.remove');
+        Route::get('trucks/{truck}/attachments/{index}/download', [TruckController::class, 'downloadAttachment'])
+        ->name('trucks.attachments.download');
+
+        Route::middleware(['auth'])->prefix('user')->name('user.')->group(function () {
+            Route::get('trucks', [TruckController::class, 'index'])->name('trucks.index');
+            Route::get('trucks/create', [TruckController::class, 'create'])->name('trucks.create');
+            Route::get('trucks/{truck}', [TruckController::class, 'show'])->name('trucks.show');
+            Route::get('trucks/{truck}/edit', [TruckController::class, 'edit'])->name('trucks.edit');
+        });
+
 });
 
 // User Routes (NEW - For Creating and Managing Their Own Controls)
@@ -101,6 +124,11 @@ Route::middleware(['auth'])->prefix('user')->name('user.')->group(function () {
     // Submit Check Forms (if you have these methods)
     Route::post('controls/{controlLine}/start', [User\CheckController::class, 'submitStartCheck'])->name('controls.start.submit');
     Route::post('controls/{controlLine}/exit', [User\CheckController::class, 'submitExitCheck'])->name('controls.exit.submit');
+
+
+     
+
+
 });
 
 // API Routes for AJAX calls
