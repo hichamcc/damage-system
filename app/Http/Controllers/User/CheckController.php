@@ -10,6 +10,7 @@ use App\Models\DamageReport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+use App\Services\FileUploadService;
 
 class CheckController extends Controller
 {
@@ -18,6 +19,7 @@ class CheckController extends Controller
      */
     public function submitStartCheck(Request $request, ControlLine $controlLine)
     {
+
         // Verify ownership
         if ($controlLine->assigned_user_id !== auth()->id()) {
             abort(403);
@@ -47,7 +49,8 @@ class CheckController extends Controller
                 $attachments = [];
                 if (isset($taskData['photos']) && is_array($taskData['photos'])) {
                     foreach ($taskData['photos'] as $photo) {
-                        $path = $photo->store('task-photos/' . $controlLine->id . '/' . $taskId . '/start', 'public');
+                        $fileUploadService = new FileUploadService();
+                        $path = $fileUploadService->uploadTaskPhoto($photo, $controlLine->id, $taskId);
                         $attachments[] = [
                             'name' => $photo->getClientOriginalName(),
                             'path' => $path,
@@ -133,9 +136,11 @@ class CheckController extends Controller
 
                 // Handle photo uploads
                 $attachments = [];
+                //use file upload service to upload photos
                 if (isset($taskData['photos']) && is_array($taskData['photos'])) {
                     foreach ($taskData['photos'] as $photo) {
-                        $path = $photo->store('task-photos/' . $controlLine->id . '/' . $taskId . '/exit', 'public');
+                        $fileUploadService = new FileUploadService();
+                        $path = $fileUploadService->uploadTaskPhoto($photo, $controlLine->id, $taskId);
                         $attachments[] = [
                             'name' => $photo->getClientOriginalName(),
                             'path' => $path,
