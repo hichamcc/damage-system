@@ -80,12 +80,28 @@ class DamageReport extends Model
             return [];
         }
 
-        return collect($this->damage_photos)->map(function ($photo) {
+        return collect($this->damage_photos)
+        ->filter() // Remove null values
+        ->flatten(1) // Flatten one level deep to handle nested arrays
+        ->filter(function ($photo) {
+            // Remove null values and ensure it's a valid photo array
+            return $photo !== null && 
+                   is_array($photo) && 
+                   isset($photo['name']) && 
+                   isset($photo['path']) &&
+                   !empty($photo['name']) &&
+                   !empty($photo['path']);
+        })
+        ->map(function ($photo) {
             return [
                 'name' => $photo['name'],
                 'url' => Storage::url($photo['path']),
+                'type' => $photo['type'] ?? 'image',
+                'size' => $photo['size'] ?? null,
             ];
-        })->toArray();
+        })
+        ->values() // Re-index after filtering
+        ->toArray();
     }
 
        // New helper methods for damage area
