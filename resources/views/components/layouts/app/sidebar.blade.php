@@ -70,9 +70,6 @@
                         {{ __('Controls') }}
                     </x-navlist.item>
 
-                    <x-navlist.item before="phosphor-truck" :href="route('admin.trucks.index')" :current="request()->routeIs('admin.trucks.*')">
-                        {{ __('Trucks') }}
-                    </x-navlist.item>
                 </x-navlist.group>
                
                 @endif
