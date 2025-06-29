@@ -7,6 +7,7 @@ use App\Models\ControlLine;
 use App\Models\ControlTemplate;
 use App\Models\Truck;
 use Illuminate\Http\Request;
+use App\Models\DamageReport;
 
 class ControlController extends Controller
 {
@@ -60,15 +61,14 @@ class ControlController extends Controller
             return redirect()->back()->with('error', 'No active control template available.');
         }
 
-        // Check if user already has an active control for this truck
+        // Check if any user already has an active control for this truck
         $existingControl = ControlLine::where('truck_id', $validated['truck_id'])
-            ->where('assigned_user_id', auth()->id())
             ->where('status', 'active')
             ->first();
 
         if ($existingControl) {
-            return redirect()->route('user.control.show', $existingControl)
-                ->with('info', 'You already have an active control for this truck.');
+            return redirect()->route('user.control.index')
+                ->with('info', 'There is already an active control for this truck.');
         }
 
         // Create control line
@@ -145,7 +145,14 @@ class ControlController extends Controller
                 ->with('info', 'Start check already completed for this control.');
         }
 
-        return view('user.control.start', compact('controlLine'));
+        // show old damage reports related to this truck that are not completed
+        $damageReports = DamageReport::where('truck_id', $controlLine->truck_id)
+        ->whereIn('status', ['reported', 'in_repair'])
+        ->with(['reportedBy', 'controlLine']) // Load relationships for better display
+        ->orderBy('created_at', 'desc')
+        ->get();
+
+        return view('user.control.start', compact('controlLine', 'damageReports'));
     }
 
     /**
@@ -171,7 +178,14 @@ class ControlController extends Controller
                 ->with('info', 'Exit check already completed for this control.');
         }
 
-        return view('user.control.exit', compact('controlLine'));
+        // show old damage reports related to this truck that are not completed
+        $damageReports = DamageReport::where('truck_id', $controlLine->truck_id)
+        ->whereIn('status', ['reported', 'in_repair'])
+        ->with(['reportedBy', 'controlLine']) // Load relationships for better display
+        ->orderBy('created_at', 'desc')
+        ->get();
+
+        return view('user.control.exit', compact('controlLine', 'damageReports'));
     }
 
     /**

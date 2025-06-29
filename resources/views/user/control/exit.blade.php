@@ -44,6 +44,9 @@
         </div>
     </div>
 
+    @include('components.old-damage-reports')
+
+
     <!-- Exit Check Form -->
     @php
         $hasExitCheck = $controlLine->tasks()

@@ -78,6 +78,12 @@
             </div>
         </div>
     @else
+
+
+    @include('components.old-damage-reports')
+
+
+
         <!-- Start Check Form -->
     <form action="{{ route('user.controls.start.submit', $controlLine) }}" method="POST" enctype="multipart/form-data" id="start-check-form">
         @csrf
@@ -383,4 +389,5 @@
         });
     });
 </script>
+
 @endsection
