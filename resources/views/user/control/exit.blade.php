@@ -154,7 +154,7 @@
                                                 <!-- Task Status -->
                                                 <div>
                                                     <label class="block text-sm font-medium text-gray-700 mb-2">Exit Check Status <span class="text-red-500">*</span></label>
-                                                    <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                                                    <div class="grid grid-cols-1 md:grid-cols-{{ $startCompletion && in_array($startCompletion->status, ['issue', 'missing', 'damaged']) ? '5' : '4' }} gap-3">
                                                         <label class="flex items-center cursor-pointer p-3 border border-gray-200 rounded-md hover:bg-gray-50">
                                                             <input type="radio" 
                                                                    name="tasks[{{ $task->id }}][status]" 
@@ -207,6 +207,21 @@
                                                                 Damaged
                                                             </span>
                                                         </label>
+                                                        @if($startCompletion && in_array($startCompletion->status, ['issue', 'missing', 'damaged']))
+                                                        <label class="flex items-center cursor-pointer p-3 border border-gray-200 rounded-md hover:bg-gray-50">
+                                                            <input type="radio" 
+                                                                   name="tasks[{{ $task->id }}][status]" 
+                                                                   value="same_as_start" 
+                                                                   class="task-status h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                                                                   {{ $task->is_required ? 'required' : '' }}>
+                                                            <span class="ml-2 flex items-center">
+                                                                <svg class="w-4 h-4 text-blue-600 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                                    <path fill-rule="evenodd" d="M4 2a2 2 0 00-2 2v11a2 2 0 002 2h12a2 2 0 002-2V4a2 2 0 00-2-2H4zm0 2h12v11H4V4zm6 2a1 1 0 100 2 1 1 0 000-2zm-1 4a1 1 0 112 0v2a1 1 0 11-2 0v-2z" clip-rule="evenodd"/>
+                                                                </svg>
+                                                                Same as Start Check
+                                                            </span>
+                                                        </label>
+                                                        @endif
                                                     </div>
                                                 </div>
 
@@ -415,6 +430,17 @@
                     if (notesField) {
                         notesField.focus();
                         notesField.placeholder = 'Please describe the issue in detail...';
+                    }
+                } else if (this.value === 'same_as_start') {
+                    // Hide damage area input for same_as_start
+                    damageAreaContainer.style.display = 'none';
+                    const damageAreaInput = damageAreaContainer.querySelector('.damage-area');
+                    if (damageAreaInput) {
+                        damageAreaInput.value = '';
+                    }
+                    
+                    if (notesField) {
+                        notesField.placeholder = 'Same damage as start check - no change in condition...';
                     }
                 } else {
                     // Hide damage area input

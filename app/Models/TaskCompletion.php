@@ -48,6 +48,7 @@ class TaskCompletion extends Model
             'issue' => 'bg-yellow-100 text-yellow-800',
             'missing' => 'bg-orange-100 text-orange-800',
             'damaged' => 'bg-red-100 text-red-800',
+            'same_as_start' => 'bg-blue-100 text-blue-800',
             default => 'bg-gray-100 text-gray-800',
         };
     }
@@ -80,7 +81,7 @@ class TaskCompletion extends Model
      // Check if this completion has damage
      public function hasDamageAttribute()
      {
-         return in_array($this->status, ['issue', 'damaged', 'missing']);
+         return in_array($this->status, ['issue', 'damaged', 'missing', 'same_as_start']);
      }
      public function task()
      {

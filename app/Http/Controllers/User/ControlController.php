@@ -68,7 +68,7 @@ class ControlController extends Controller
 
         if ($existingControl) {
             return redirect()->route('user.control.index')
-                ->with('info', 'There is already an active control for this truck.');
+                ->with('info', 'Other user already on this case.');
         }
 
         // Create control line

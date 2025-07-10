@@ -157,7 +157,7 @@
                 $exit = $item['exit'];
                 $hasChanges = $item['has_changes'];
                 $hasIssues = ($start && in_array($start->status, ['issue', 'missing', 'damaged'])) || 
-                           ($exit && in_array($exit->status, ['issue', 'missing', 'damaged']));
+                           ($exit && in_array($exit->status, ['issue', 'missing', 'damaged', 'same_as_start']));
             @endphp
             <div class="comparison-item bg-white rounded-lg shadow {{ $hasChanges ? 'ring-2 ring-red-200' : '' }}" 
                  data-has-changes="{{ $hasChanges ? 'true' : 'false' }}"
@@ -288,17 +288,21 @@
                             <div class="flex items-center justify-between mb-3">
                                 <h6 class="text-sm font-medium text-orange-900">EXIT CHECK</h6>
                                 @if($exit)
-                                    <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium {{ $exit->status === 'ok' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+                                    <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium {{ $exit->status === 'ok' ? 'bg-green-100 text-green-800' : ($exit->status === 'same_as_start' ? 'bg-blue-100 text-blue-800' : 'bg-red-100 text-red-800') }}">
                                         @if($exit->status === 'ok')
                                             <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
                                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                            </svg>
+                                        @elseif($exit->status === 'same_as_start')
+                                            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M4 2a2 2 0 00-2 2v11a2 2 0 002 2h12a2 2 0 002-2V4a2 2 0 00-2-2H4zm0 2h12v11H4V4zm6 2a1 1 0 100 2 1 1 0 000-2zm-1 4a1 1 0 112 0v2a1 1 0 11-2 0v-2z" clip-rule="evenodd"/>
                                             </svg>
                                         @else
                                             <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
                                                 <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
                                             </svg>
                                         @endif
-                                        {{ ucfirst($exit->status) }}
+                                        {{ $exit->status === 'same_as_start' ? 'Same as Start' : ucfirst($exit->status) }}
                                     </span>
                                 @else
                                     <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-gray-100 text-gray-600">

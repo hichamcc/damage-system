@@ -264,7 +264,7 @@
             <div class="divide-y divide-gray-100">
                 @foreach($controlLine->tasks as $task)
                     @php
-                        $hasIssues = $task->completions->whereIn('status', ['issue', 'missing', 'damaged'])->count() > 0;
+                        $hasIssues = $task->completions->whereIn('status', ['issue', 'missing', 'damaged', 'same_as_start'])->count() > 0;
                         $isCompleted = $task->completions->count() > 0;
                         $isPending = $task->completions->count() === 0;
                     @endphp
@@ -360,6 +360,11 @@
                                                                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
                                                                             </svg>
                                                                             Damaged
+                                                                        @elseif($completion->status === 'same_as_start')
+                                                                            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                                                <path fill-rule="evenodd" d="M4 2a2 2 0 00-2 2v11a2 2 0 002 2h12a2 2 0 002-2V4a2 2 0 00-2-2H4zm0 2h12v11H4V4zm6 2a1 1 0 100 2 1 1 0 000-2zm-1 4a1 1 0 112 0v2a1 1 0 11-2 0v-2z" clip-rule="evenodd"/>
+                                                                            </svg>
+                                                                            Same as Start Check
                                                                         @endif
                                                                     </span>
                                                                 </div>

@@ -113,7 +113,7 @@ class CheckController extends Controller
 
         $validated = $request->validate([
             'tasks' => 'required|array',
-            'tasks.*.status' => 'required|in:ok,issue,missing,damaged',
+            'tasks.*.status' => 'required|in:ok,issue,missing,damaged,same_as_start',
             'tasks.*.notes' => 'nullable|string|max:1000',
             'tasks.*.damage_area' => 'nullable|string|max:255',
             'tasks.*.photos' => 'nullable|array',
@@ -163,7 +163,7 @@ class CheckController extends Controller
                     'completed_at' => now(),
                 ]);
 
-                // Create damage report if there are issues
+                // Create damage report if there are issues (but not for same_as_start status)
                 if (in_array($taskData['status'], ['issue', 'missing', 'damaged'])) {
                     $this->createDamageReport($controlLine, $task, $taskData, 'exit');
                 }
@@ -208,7 +208,7 @@ class CheckController extends Controller
 
         $validated = $request->validate([
             'check_type' => 'required|in:start,exit',
-            'status' => 'required|in:ok,issue,missing,damaged',
+            'status' => 'required|in:ok,issue,missing,damaged,same_as_start',
             'notes' => 'nullable|string|max:1000',
             'damage_area' => 'nullable|string|max:255',
             'photos' => 'nullable|array',
@@ -256,7 +256,7 @@ class CheckController extends Controller
                 $task->update(['status' => 'completed']);
             }
 
-            // Create damage report if needed
+            // Create damage report if needed (but not for same_as_start status)
             if (in_array($validated['status'], ['issue', 'missing', 'damaged'])) {
                 $this->createDamageReport($task->controlLine, $task, $validated, $validated['check_type']);
             }
